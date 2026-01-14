@@ -4,7 +4,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    height: 100vh;
+    min-height: 100vh;
     padding: 20px;
     padding-top: 40px;
     overflow: hidden;
@@ -13,10 +13,13 @@ body {
     z-index: 100;
     width: 100%;
     max-width: 450px;
+    max-height: calc(100vh - 60px);
     background-color: #710222;
     border-radius: 15px;
     box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.5);
     padding: 30px;
+    display: flex;
+    flex-direction: column;
 }
 .label {
     font-size: 16px;
@@ -98,8 +101,9 @@ body {
 .entries-section {
     border-top: 1px solid rgba(213, 115, 4, 0.2);
     padding-top: 25px;
-    max-height: 400px;
     overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 .entries-section h3 {
     margin: 0 0 15px 0;
@@ -230,7 +234,7 @@ body {
     
     .entries-section {
         padding-top: 20px;
-        max-height: 220px;
+        max-height: 380px;
     }
     
     .entries-section h3 {
