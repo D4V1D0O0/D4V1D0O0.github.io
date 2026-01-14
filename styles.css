@@ -3,9 +3,10 @@ body {
     background-color: #3a111d;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     height: 100vh;
     padding: 20px;
+    padding-top: 40px;
     overflow: hidden;
 }
 .container {
@@ -172,4 +173,152 @@ body {
 }
 .entries-section::-webkit-scrollbar-thumb:hover {
     background: #a85803;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        max-width: 100%;
+        padding: 20px;
+        border-radius: 12px;
+    }
+    
+    .label {
+        font-size: 15px;
+        margin-bottom: 6px;
+    }
+    
+    .value {
+        font-size: 42px;
+        margin-bottom: 10px;
+    }
+    
+    .starting-balance {
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+    
+    .form-section {
+        padding-top: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .form-section h3 {
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+    
+    .form-section form {
+        gap: 10px;
+    }
+    
+    .form-section input {
+        padding: 11px 12px;
+        font-size: 16px;
+        border-radius: 7px;
+    }
+    
+    .form-section button {
+        padding: 11px;
+        font-size: 14px;
+        border-radius: 7px;
+    }
+    
+    .entries-section {
+        padding-top: 20px;
+        max-height: 220px;
+    }
+    
+    .entries-section h3 {
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+    
+    .entry {
+        padding: 10px;
+        margin-bottom: 8px;
+        border-radius: 7px;
+        border-left: 3px solid #d57304;
+    }
+    
+    .entry-header {
+        margin-bottom: 6px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .entry-item {
+        font-size: 13px;
+        min-width: 0;
+        flex: 1;
+    }
+    
+    .entry-amount {
+        font-size: 13px;
+        white-space: nowrap;
+    }
+    
+    .entry-footer {
+        font-size: 10px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .entry-date {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .delete-btn {
+        padding: 3px 6px;
+        font-size: 10px;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 400px) {
+    .container {
+        padding: 16px;
+    }
+    
+    .label {
+        font-size: 14px;
+    }
+    
+    .value {
+        font-size: 36px;
+    }
+    
+    .starting-balance {
+        font-size: 12px;
+    }
+    
+    .form-section h3 {
+        font-size: 13px;
+    }
+    
+    .form-section input {
+        padding: 10px;
+        font-size: 15px;
+    }
+    
+    .entries-section {
+        max-height: 180px;
+    }
+    
+    .entry-item {
+        font-size: 12px;
+    }
+    
+    .entry-amount {
+        font-size: 12px;
+    }
+    
+    .entry-footer {
+        font-size: 9px;
+    }
 }
