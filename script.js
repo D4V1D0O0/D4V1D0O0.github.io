@@ -67,10 +67,10 @@ function displayEntries() {
         if (entry.Date) {
             if (entry.Date.toDate) {
                 // Firebase Timestamp
-                dateStr = entry.Date.toDate().toLocaleString('sv-SE');
+                dateStr = entry.Date.toDate().toLocaleString('sv-SE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
             } else if (typeof entry.Date === 'string') {
                 // ISO string
-                dateStr = new Date(entry.Date).toLocaleString('sv-SE');
+                dateStr = new Date(entry.Date).toLocaleString('sv-SE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
             }
         }
         

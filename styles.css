@@ -4,10 +4,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    height: 100vh;
+    min-height: 100vh;
     padding: 20px;
     padding-top: 40px;
-    overflow: hidden;
+    overflow-y: auto;
 }
 .container {
     z-index: 100;
@@ -19,7 +19,7 @@ body {
     padding: 30px;
 }
 .label {
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 8px;
     text-align: center;
     color: #e0e0e0;
@@ -28,14 +28,14 @@ body {
     letter-spacing: 1px;
 }
 .value {
-    font-size: 56px;
+    font-size: 48px;
     font-weight: 700;
     color: #d57304;
     text-align: center;
     margin-bottom: 12px;
 }
 .starting-balance {
-    font-size: 14px;
+    font-size: 13px;
     color: #b8b8b8;
     text-align: center;
     margin-bottom: 25px;
@@ -48,7 +48,7 @@ body {
 }
 .form-section h3 {
     margin: 0 0 15px 0;
-    font-size: 16px;
+    font-size: 15px;
     color: #d57304;
     font-weight: 600;
     text-transform: uppercase;
@@ -60,10 +60,10 @@ body {
     gap: 12px;
 }
 .form-section input {
-    padding: 12px 14px;
+    padding: 11px 14px;
     border: 1px solid rgba(213, 115, 4, 0.3);
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     background-color: rgba(31, 31, 31, 0.6);
     color: #e0e0e0;
     transition: all 0.3s ease;
@@ -78,13 +78,13 @@ body {
     color: #707070;
 }
 .form-section button {
-    padding: 12px;
+    padding: 11px;
     background-color: #d57304;
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     transition: all 0.3s ease;
     text-transform: uppercase;
@@ -98,12 +98,12 @@ body {
 .entries-section {
     border-top: 1px solid rgba(213, 115, 4, 0.2);
     padding-top: 25px;
-    max-height: 280px;
+    max-height: 350px;
     overflow-y: auto;
 }
 .entries-section h3 {
     margin: 0 0 15px 0;
-    font-size: 16px;
+    font-size: 15px;
     color: #d57304;
     font-weight: 600;
     text-transform: uppercase;
@@ -129,12 +129,12 @@ body {
 .entry-item {
     font-weight: 600;
     color: #e0e0e0;
-    font-size: 14px;
+    font-size: 13px;
 }
 .entry-amount {
     color: #ff8a5b;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
 }
 .entry-footer {
     display: flex;
