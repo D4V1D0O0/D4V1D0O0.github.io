@@ -62,7 +62,10 @@ function displayEntries() {
     entriesList.innerHTML = '';
     
     const sortedEntries = [...purchases].reverse();
-    sortedEntries.forEach((entry, index) => {
+    sortedEntries.forEach((entry, reversedIndex) => {
+        // Calculate the original index
+        const originalIndex = purchases.length - 1 - reversedIndex;
+        
         let dateStr = '';
         if (entry.Date) {
             if (entry.Date.toDate) {
@@ -83,7 +86,7 @@ function displayEntries() {
             </div>
             <div class="entry-footer">
                 <span class="entry-date">${dateStr}</span>
-                <button class="delete-btn" onclick="deleteEntry(${index})">Radera</button>
+                <button class="delete-btn" onclick="deleteEntry(${originalIndex})">Radera</button>
             </div>
         `;
         entriesList.appendChild(entryDiv);
