@@ -8,11 +8,24 @@
 </head>
 <body>
     <div class="container">
-        <div class="label">Saldo</div>
+        <div class="label">Aktuellt Saldo</div>
         <div class="value" id="balance">Loading...</div>
-        <div class="updated" id="updated">Updaterad: Loading...</div>
+        <div class="starting-balance" id="startingBalance">Startosaldo: Loading...</div>
+        
+        <div class="form-section">
+            <h3>Lägg till utgift</h3>
+            <form id="expenseForm">
+                <input type="text" id="itemInput" placeholder="Vad köpte du?" required>
+                <input type="number" id="amountInput" placeholder="Belopp" step="0.01" required>
+                <button type="submit">Lägg till</button>
+            </form>
+        </div>
+        
+        <div class="entries-section">
+            <h3>Utgifter</h3>
+            <div id="entriesList"></div>
+        </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

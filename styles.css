@@ -1,33 +1,118 @@
 body {
     font-family: Arial, sans-serif;
-    text-align: center;
     background-color: black;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 90vh;
+    height: 100vh;
+    padding: 20px;
     overflow: hidden;
 }
 .container {
     z-index: 100;
-    padding: 5px;
-    width: 90%;
-    max-width: 350px;
+    width: 100%;
+    max-width: 500px;
     background-color: white;
     border-radius: 20px;
     box-shadow: 0px 0px 20px 10px rgba(174, 0, 255, 0.5);
+    padding: 20px;
 }
 .label {
     font-size: 24px;
     margin-bottom: 10px;
+    text-align: center;
 }
 .value {
     font-size: 48px;
     font-weight: bold;
     color: #000000;
+    text-align: center;
     margin-bottom: 10px;
 }
-.updated {
+.starting-balance {
+    font-size: 16px;
+    color: #666;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.form-section {
+    border-top: 2px solid #eee;
+    padding-top: 20px;
+    margin-bottom: 20px;
+}
+.form-section h3 {
+    margin: 0 0 15px 0;
     font-size: 18px;
-    color: rgb(0, 0, 0);
+}
+.form-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.form-section input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+.form-section button {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+.form-section button:hover {
+    background-color: #0056b3;
+}
+.entries-section {
+    border-top: 2px solid #eee;
+    padding-top: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+.entries-section h3 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+}
+.entry {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #007bff;
+}
+.entry-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+.entry-item {
+    font-weight: bold;
+}
+.entry-amount {
+    color: #d32f2f;
+    font-weight: bold;
+}
+.entry-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #999;
+}
+.delete-btn {
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.delete-btn:hover {
+    background-color: #b71c1c;
 }
