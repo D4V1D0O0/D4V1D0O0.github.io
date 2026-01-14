@@ -4,36 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saldo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-            background-color: #f0f0f0;
-        }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .label {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        .value {
-            font-size: 48px;
-            font-weight: bold;
-            color: #007bff;
-            margin-bottom: 10px;
-        }
-        .updated {
-            font-size: 18px;
-            color: gray;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
@@ -42,6 +13,7 @@
         <div class="updated" id="updated">Updaterad: Loading...</div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <iframe width="402" height="346" frameborder="0" scrolling="no" src="https://studentbth-my.sharepoint.com/personal/dabr23_student_bth_se/_layouts/15/Doc.aspx?sourcedoc={3bcfbb86-6a1c-4637-8777-fc0afb3f1c13}&action=embedview&wdAllowInteractivity=False&wdHideGridlines=True&wdHideHeaders=True&wdDownloadButton=True&wdInConfigurator=True&wdInConfigurator=True"></iframe>
     <script>
         fetch('data.csv')
             .then(response => response.text())
