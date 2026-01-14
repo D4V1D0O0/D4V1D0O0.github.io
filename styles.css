@@ -4,10 +4,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    min-height: 100vh;
+    height: 100vh;
     padding: 20px;
     padding-top: 40px;
-    overflow-y: auto;
+    overflow: hidden;
 }
 .container {
     z-index: 100;
