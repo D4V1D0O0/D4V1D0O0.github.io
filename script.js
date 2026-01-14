@@ -1,43 +1,85 @@
-let data = {};
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { getFirestore, collection, doc, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDeUOT-hWKgAnAtlwRFujoOpJNDP_WljoE",
+    authDomain: "polhemsgatan17b.firebaseapp.com",
+    projectId: "polhemsgatan17b",
+    storageBucket: "polhemsgatan17b.firebasestorage.app",
+    messagingSenderId: "330775555909",
+    appId: "1:330775555909:web:e644773610112ef007182c"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let startingBalance = 0;
+let purchases = [];
 
 function loadData() {
-    fetch('data.json')
-        .then(response => response.json())
-        .then(jsonData => {
-            data = jsonData;
-            displayBalance();
-            displayEntries();
-        })
-        .catch(error => {
-            console.error('Error loading data:', error);
-            document.getElementById('balance').textContent = 'Error loading data';
-        });
+    // Load Starting Balance
+    const startingBalanceRef = doc(db, 'Saldo', 'StartingBalance');
+    onSnapshot(startingBalanceRef, (snapshot) => {
+        if (snapshot.exists()) {
+            startingBalance = snapshot.data().Amount || 0;
+            console.log('Starting balance loaded:', startingBalance);
+        }
+        displayBalance();
+    }, (error) => {
+        console.error('Error loading starting balance:', error);
+        document.getElementById('startingBalance').textContent = 'Fel: ' + error.message;
+    });
+    
+    // Load Purchases
+    const purchasesRef = doc(db, 'Saldo', 'Purchases');
+    onSnapshot(purchasesRef, (snapshot) => {
+        if (snapshot.exists()) {
+            const data = snapshot.data();
+            purchases = data.entries || [];
+            console.log('Purchases loaded:', purchases);
+        } else {
+            purchases = [];
+            console.log('Purchases document does not exist');
+        }
+        displayBalance();
+        displayEntries();
+    }, (error) => {
+        console.error('Error loading purchases:', error);
+        document.getElementById('balance').textContent = 'Fel: ' + error.message;
+    });
 }
 
 function displayBalance() {
-    const startingBalance = data.startingBalance || 0;
-    const totalSpent = (data.entries || []).reduce((sum, entry) => sum + entry.amount, 0);
+    const totalSpent = purchases.reduce((sum, entry) => sum + (entry.Cost || 0), 0);
     const currentBalance = startingBalance - totalSpent;
     
     document.getElementById('balance').textContent = currentBalance.toFixed(2) + ' kr';
-    document.getElementById('startingBalance').textContent = 'Startosaldo: ' + startingBalance.toFixed(2) + ' kr';
+    document.getElementById('startingBalance').textContent = 'Startsaldo: ' + startingBalance.toFixed(2) + ' kr';
 }
 
 function displayEntries() {
     const entriesList = document.getElementById('entriesList');
     entriesList.innerHTML = '';
     
-    const sortedEntries = [...(data.entries || [])].reverse();
+    const sortedEntries = [...purchases].reverse();
     sortedEntries.forEach((entry, index) => {
-        const date = new Date(entry.date);
-        const dateStr = date.toLocaleString('sv-SE');
+        let dateStr = '';
+        if (entry.Date) {
+            if (entry.Date.toDate) {
+                // Firebase Timestamp
+                dateStr = entry.Date.toDate().toLocaleString('sv-SE');
+            } else if (typeof entry.Date === 'string') {
+                // ISO string
+                dateStr = new Date(entry.Date).toLocaleString('sv-SE');
+            }
+        }
         
         const entryDiv = document.createElement('div');
         entryDiv.className = 'entry';
         entryDiv.innerHTML = `
             <div class="entry-header">
-                <span class="entry-item">${entry.item}</span>
-                <span class="entry-amount">-${entry.amount.toFixed(2)} kr</span>
+                <span class="entry-item">${entry.Type || 'N/A'}</span>
+                <span class="entry-amount">-${parseFloat(entry.Cost || 0).toFixed(2)} kr</span>
             </div>
             <div class="entry-footer">
                 <span class="entry-date">${dateStr}</span>
@@ -49,16 +91,21 @@ function displayEntries() {
 }
 
 function deleteEntry(index) {
-    data.entries.splice(index, 1);
+    purchases.splice(index, 1);
     saveData();
     displayBalance();
     displayEntries();
 }
 
+// Make functions available globally for onclick handlers
+window.deleteEntry = deleteEntry;
+
 function saveData() {
-    // Note: This saves to localStorage for now since browsers can't write files directly
-    localStorage.setItem('expenseData', JSON.stringify(data));
-    console.log('Data saved to localStorage');
+    const purchasesRef = doc(db, 'Saldo', 'Purchases');
+    updateDoc(purchasesRef, {
+        entries: purchases
+    });
+    console.log('Data saved to Firestore');
 }
 
 document.getElementById('expenseForm').addEventListener('submit', function(e) {
@@ -68,16 +115,12 @@ document.getElementById('expenseForm').addEventListener('submit', function(e) {
     const amount = parseFloat(document.getElementById('amountInput').value);
     
     const newEntry = {
-        id: (data.entries || []).length + 1,
-        item: item,
-        amount: amount,
-        date: new Date().toISOString()
+        Type: item,
+        Cost: amount,
+        Date: new Date().toISOString()
     };
     
-    if (!data.entries) {
-        data.entries = [];
-    }
-    data.entries.push(newEntry);
+    purchases.push(newEntry);
     
     saveData();
     displayBalance();
