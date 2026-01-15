@@ -1,6 +1,6 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "Saldo",
+  "short_name": "Saldo",
   "icons": [
     {
       "src": "/images/web-app-manifest-192x192.png",
