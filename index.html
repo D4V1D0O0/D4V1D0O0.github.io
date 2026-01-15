@@ -12,12 +12,27 @@
         <div class="label">Aktuellt Saldo</div>
         <div class="value" id="balance">Loading...</div>
         <div class="starting-balance" id="startingBalance">Startosaldo: Loading...</div>
+
+        <div class="debts-section">
+            <h3>Skulder till kontot</h3>
+            <div id="debtsSummary">Loading...</div>
+        </div>
         
-        <div class="form-section">
-            <h3>Lägg till utgift</h3>
+        <div class="form-section form-open">
+            <div class="form-header">
+                <h3>Lägg till utgift</h3>
+                <button type="button" id="toggleFormButton" class="form-toggle-button">Dölj formulär</button>
+            </div>
             <form id="expenseForm">
                 <input type="text" id="itemInput" placeholder="Vad köpte du?" required>
-                <input type="number" id="amountInput" placeholder="Belopp" step="0.01" min="0" required>
+                <input type="number" id="totalAmountInput" placeholder="Totalbelopp (hela köpet)" step="0.01" min="0" required>
+                <input type="number" id="personalAmountInput" placeholder="Privat del (ej gemensam, valfri)" step="0.01" min="0">
+                <select id="payerSelect" required>
+                    <option value="" disabled selected>Vem betalade?</option>
+                    <option value="David">David</option>
+                    <option value="Julius">Julius</option>
+                    <option value="Alvin">Alvin</option>
+                </select>
                 <button type="submit">Lägg till</button>
             </form>
         </div>
