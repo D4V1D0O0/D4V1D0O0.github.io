@@ -1,20 +1,23 @@
 body {
+    margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #3a111d;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    min-height: calc(var(--vh, 1vh) * 100);
-    padding: 20px;
-    padding-top: 30px;
-    overflow-y: auto;
+    /* min-height: calc(var(--vh, 1vh) * 100); */
+    /* min-height: 100%; */
+    overflow-y: hidden;
     box-sizing: border-box;
 }
 .container {
     z-index: 100;
     width: 100%;
     max-width: 450px;
-    min-height: calc(var(--vh, 1vh) * 100 - 80px);
+    /* min-height: calc(var(--vh, 1vh) * 100 - 80px); */
+    /* max-height: calc(100vh - 80px); */
+    max-height: 96vh;
+    margin: 2vh;
     background-color: #710222;
     border-radius: 15px;
     box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.5);
