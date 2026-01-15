@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Saldo</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -17,7 +17,7 @@
             <h3>Lägg till utgift</h3>
             <form id="expenseForm">
                 <input type="text" id="itemInput" placeholder="Vad köpte du?" required>
-                <input type="number" id="amountInput" placeholder="Belopp" step="0.01" required>
+                <input type="number" id="amountInput" placeholder="Belopp" step="0.01" min="0" required>
                 <button type="submit">Lägg till</button>
             </form>
         </div>

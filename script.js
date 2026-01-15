@@ -5,7 +5,6 @@ const firebaseConfig = {
     apiKey: "AIzaSyDeUOT-hWKgAnAtlwRFujoOpJNDP_WljoE",
     authDomain: "polhemsgatan17b.firebaseapp.com",
     projectId: "polhemsgatan17b",
-    storageBucket: "polhemsgatan17b.firebasestorage.app",
     messagingSenderId: "330775555909",
     appId: "1:330775555909:web:e644773610112ef007182c"
 };
@@ -15,6 +14,15 @@ const db = getFirestore(app);
 
 let startingBalance = 0;
 let purchases = [];
+
+// --- Mobile viewport height fix (for proper 100vh on mobile) ---
+function setViewportHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+setViewportHeight();
+window.addEventListener('resize', setViewportHeight);
+// --- End viewport fix ---
 
 function loadData() {
     // Load Starting Balance
@@ -79,6 +87,7 @@ function displayEntries() {
         
         const entryDiv = document.createElement('div');
         entryDiv.className = 'entry';
+
         entryDiv.innerHTML = `
             <div class="entry-header">
                 <span class="entry-item">${entry.Type || 'N/A'}</span>
@@ -116,6 +125,11 @@ document.getElementById('expenseForm').addEventListener('submit', function(e) {
     
     const item = document.getElementById('itemInput').value;
     const amount = parseFloat(document.getElementById('amountInput').value);
+
+    if (isNaN(amount) || amount < 0) {
+        alert('Belopp kan inte vara negativt.');
+        return;
+    }
     
     const newEntry = {
         Type: item,
