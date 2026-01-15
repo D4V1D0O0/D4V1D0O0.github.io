@@ -70,7 +70,7 @@ function loadData() {
 }
 
 function displayBalance() {
-    const totalSpent = purchases.reduce((sum, entry) => sum + (entry.Cost || 0), 0);
+    const totalSpent = purchases.reduce((sum, entry) => sum + (entry.TotalCost || 0), 0);
     const currentBalance = startingBalance - totalSpent;
     
     document.getElementById('balance').textContent = formatAmount(currentBalance) + ' kr';
@@ -133,7 +133,7 @@ function displayEntries() {
         const personalValue = typeof entry.PersonalCost === 'number' ? entry.PersonalCost : 0;
         const payer = entry.Payer || '';
 
-        const amountText = '-' + formatAmount(sharedValue) + ' kr';
+        const amountText = '-' + formatAmount(totalValue) + ' kr';
 
         const detailsParts = [];
         if (totalValue && totalValue !== sharedValue) {
@@ -145,7 +145,8 @@ function displayEntries() {
         if (personalValue > 0) {
             const personalText = formatAmount(personalValue) + ' kr';
             if (payer) {
-                detailsParts.push(`Privat: ${personalText} (${payer} är skyldig ${personalText})`);
+                // detailsParts.push(`Privat: ${personalText} (${payer} är skyldig ${personalText})`);
+                detailsParts.push(`Privat: ${personalText} (${payer})`);
             } else {
                 detailsParts.push(`Privat: ${personalText}`);
             }
