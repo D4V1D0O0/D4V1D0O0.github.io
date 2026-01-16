@@ -284,5 +284,18 @@ document.getElementById('expenseForm').addEventListener('submit', function(e) {
     }
 });
 
+window.addEventListener('load', () => {
+    const splash = document.getElementById('splash');
+    if (!splash) return;
+
+    // Liten delay för snyggare känsla
+    setTimeout(() => {
+        splash.classList.add('hidden');
+
+        // Ta bort helt efter fade
+        setTimeout(() => splash.remove(), 700);
+    }, 500);
+});
+
 // Load data on page load
 loadData();

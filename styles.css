@@ -12,13 +12,42 @@ body {
     overflow-y: hidden;
     box-sizing: border-box;
 }
+/* Splash screen */
+#splash {
+    position: fixed;
+    inset: 0;
+    background-color: #3a111d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.6s ease;
+}
+
+#splash.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#splash img {
+    width: 300px;
+    max-width: 60%;
+    animation: splashPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes splashPulse {
+    0%   { opacity: 1; }
+    50%  { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
 .container {
     z-index: 100;
     width: 100%;
     max-width: 450px;
     /* min-height: calc(var(--vh, 1vh) * 100 - 80px); */
     /* max-height: calc(100vh - 80px); */
-    max-height: 96vh;
+    height: 96vh;
     margin: 2vh;
     background-color: #710222;
     border-radius: 15px;
