@@ -14,6 +14,8 @@ const db = getFirestore(app);
 
 let startingBalance = 0;
 let purchases = [];
+let startingBalanceLoaded = false;
+let purchasesLoaded = false;
 
 function formatAmount(value) {
     if (typeof value !== 'number' || isNaN(value)) {
@@ -43,7 +45,11 @@ function loadData() {
             startingBalance = snapshot.data().Amount || 0;
             console.log('Starting balance loaded:', startingBalance);
         }
+
+        startingBalanceLoaded = true;
         displayBalance();
+        hideSplashWhenReady();
+
     }, (error) => {
         console.error('Error loading starting balance:', error);
         document.getElementById('startingBalance').textContent = 'Fel: ' + error.message;
@@ -53,16 +59,19 @@ function loadData() {
     const purchasesRef = doc(db, 'Saldo', 'Purchases');
     onSnapshot(purchasesRef, (snapshot) => {
         if (snapshot.exists()) {
-            const data = snapshot.data();
-            purchases = data.entries || [];
+            purchases = snapshot.data().entries || [];
             console.log('Purchases loaded:', purchases);
         } else {
             purchases = [];
             console.log('Purchases document does not exist');
         }
+
+        purchasesLoaded = true;
         displayBalance();
         displayEntries();
         displayDebts();
+        hideSplashWhenReady();
+
     }, (error) => {
         console.error('Error loading purchases:', error);
         document.getElementById('balance').textContent = 'Fel: ' + error.message;
@@ -284,18 +293,17 @@ document.getElementById('expenseForm').addEventListener('submit', function(e) {
     }
 });
 
-window.addEventListener('load', () => {
+function hideSplashWhenReady() {
+    if (!startingBalanceLoaded || !purchasesLoaded) return;
+
     const splash = document.getElementById('splash');
     if (!splash) return;
 
-    // Liten delay för snyggare känsla
-    setTimeout(() => {
-        splash.classList.add('hidden');
+    splash.classList.add('hidden');
 
-        // Ta bort helt efter fade
-        setTimeout(() => splash.remove(), 700);
-    }, 500);
-});
+    // Remove from DOM after fade-out
+    setTimeout(() => splash.remove(), 700);
+}
 
 // Load data on page load
 loadData();
