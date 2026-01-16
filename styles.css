@@ -48,7 +48,7 @@ body {
     /* min-height: calc(var(--vh, 1vh) * 100 - 80px); */
     /* max-height: calc(100vh - 80px); */
     height: 96vh;
-    margin: 2vh;
+    /* margin: 2vh; */
     background-color: #710222;
     border-radius: 15px;
     box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.5);
