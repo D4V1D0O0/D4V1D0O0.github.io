@@ -17,38 +17,60 @@
         <img src="images/web-app-manifest-512x512.png" alt="Loading">
     </div>
     <div class="container">
-        <div class="label">Aktuellt Saldo</div>
-        <div class="value" id="balance">Loading...</div>
-        <div class="starting-balance" id="startingBalance">Startosaldo: Loading...</div>
+        <!-- TAB: SALDO -->
+        <section class="tab active" id="tab-saldo">
+            <div class="label">Aktuellt Saldo</div>
+            <div class="value" id="balance">Loading...</div>
+            <div class="starting-balance" id="startingBalance">Startsaldo: Loading...</div>
 
-        <div class="debts-section">
-            <h3>Skulder till kontot</h3>
-            <div id="debtsSummary">Loading...</div>
-        </div>
-        
-        <div class="form-section form-open">
-            <div class="form-header">
-                <h3>Lägg till utgift</h3>
-                <button type="button" id="toggleFormButton" class="form-toggle-button">Dölj formulär</button>
+            <div class="debts-section">
+                <h3>Skulder till kontot</h3>
+                <div id="debtsSummary">Loading...</div>
             </div>
-            <form id="expenseForm">
-                <input type="text" id="itemInput" placeholder="Vad köpte du?" required>
-                <input type="number" id="totalAmountInput" placeholder="Totalbelopp (hela köpet)" step="0.01" min="0" required>
-                <input type="number" id="personalAmountInput" placeholder="Privat del (ej gemensam, valfri)" step="0.01" min="0">
-                <select id="payerSelect" required>
-                    <option value="" disabled selected>Vem betalade?</option>
-                    <option value="David">David</option>
-                    <option value="Julius">Julius</option>
-                    <option value="Alvin">Alvin</option>
-                </select>
-                <button type="submit">Lägg till</button>
-            </form>
-        </div>
-        
-        <div class="entries-section">
-            <h3>Utgifter</h3>
-            <div id="entriesList"></div>
-        </div>
+
+            <div class="entries-section">
+                <h3>Utgifter</h3>
+                <div id="entriesList"></div>
+            </div>
+        </section>
+
+        <!-- TAB: SKULDER -->
+        <!-- <section class="tab" id="tab-debts">
+            <div class="debts-section">
+                <h3>Skulder till kontot</h3>
+                <div id="debtsSummary">Loading...</div>
+            </div>
+        </section> -->
+
+        <!-- TAB: LÄGG TILL -->
+        <section class="tab" id="tab-add">
+            <div class="form-section form-open">
+                <div class="form-header">
+                    <h3>Lägg till utgift</h3>
+                    <!-- <button type="button" id="toggleFormButton" class="form-toggle-button">
+                        Dölj formulär
+                    </button> -->
+                </div>
+                <form id="expenseForm">
+                    <input type="text" id="itemInput" placeholder="Vad köpte du?" required>
+                    <input type="number" id="totalAmountInput" placeholder="Totalbelopp" step="0.01" min="0" required>
+                    <input type="number" id="personalAmountInput" placeholder="Privat del" step="0.01" min="0">
+                    <select id="payerSelect" required>
+                        <option value="" disabled selected>Vem betalade?</option>
+                        <option value="David">David</option>
+                        <option value="Julius">Julius</option>
+                        <option value="Alvin">Alvin</option>
+                    </select>
+                    <button type="submit">Lägg till</button>
+                </form>
+            </div>
+        </section>
     </div>
+    <nav class="bottom-nav">
+        <!-- <button class="nav-btn" data-tab="debts">Sug mig</button> -->
+        <button class="nav-btn active" data-tab="saldo">Saldo</button>
+        <button class="nav-btn" data-tab="add">Lägg till</button>
+    </nav>
+
 </body>
 </html>

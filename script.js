@@ -197,26 +197,26 @@ const formSection = document.querySelector('.form-section');
 const expenseFormEl = document.getElementById('expenseForm');
 const toggleFormButton = document.getElementById('toggleFormButton');
 
-if (window.innerWidth <= 600) {
-    formSection.classList.remove('form-open');
-    updateFormToggleLabel();
-}
+// if (window.innerWidth <= 600) {
+//     formSection.classList.remove('form-open');
+//     updateFormToggleLabel();
+// }
 
-function updateFormToggleLabel() {
-    if (!toggleFormButton || !formSection) return;
-    const isOpen = formSection.classList.contains('form-open');
-    toggleFormButton.textContent = isOpen ? 'Dölj formulär' : '+ Lägg till utgift';
-}
+// function updateFormToggleLabel() {
+//     if (!toggleFormButton || !formSection) return;
+//     const isOpen = formSection.classList.contains('form-open');
+//     toggleFormButton.textContent = isOpen ? 'Dölj formulär' : '+ Lägg till utgift';
+// }
 
-if (toggleFormButton && formSection) {
-    toggleFormButton.addEventListener('click', () => {
-        formSection.classList.toggle('form-open');
-        updateFormToggleLabel();
-    });
+// if (toggleFormButton && formSection) {
+//     toggleFormButton.addEventListener('click', () => {
+//         formSection.classList.toggle('form-open');
+//         updateFormToggleLabel();
+//     });
 
-    // Ensure correct initial label
-    updateFormToggleLabel();
-}
+//     // Ensure correct initial label
+//     updateFormToggleLabel();
+// }
 // --- End collapsible form toggle ---
 
 function saveData() {
@@ -287,11 +287,31 @@ document.getElementById('expenseForm').addEventListener('submit', function(e) {
     document.getElementById('payerSelect').value = '';
 
     // On small screens, collapse the form after adding an expense to keep focus on the list
-    if (window.innerWidth <= 600 && formSection) {
-        formSection.classList.remove('form-open');
-        updateFormToggleLabel();
-    }
+    // if (window.innerWidth <= 600 && formSection) {
+    //     formSection.classList.remove('form-open');
+    //     updateFormToggleLabel();
+    // }
 });
+
+const tabs = document.querySelectorAll('.tab');
+const navButtons = document.querySelectorAll('.nav-btn');
+
+function switchTab(tabName) {
+    tabs.forEach(tab => {
+        tab.classList.toggle('active', tab.id === `tab-${tabName}`);
+    });
+
+    navButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+}
+
+navButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        switchTab(btn.dataset.tab);
+    });
+});
+
 
 function hideSplashWhenReady() {
     if (!startingBalanceLoaded || !purchasesLoaded) return;
