@@ -275,10 +275,7 @@ body {
 
 /* Mobile Responsiveness */
 @media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
-    
+
     .container {
         max-width: 100%;
         padding: 20px;
