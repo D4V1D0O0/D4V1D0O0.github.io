@@ -38,33 +38,45 @@ Object.keys(roommates).forEach(name => {
 const debtsRef = doc(db, 'Saldo', 'Debts');
 onSnapshot(debtsRef, snap => {
     debts = snap.exists() ? snap.data().entries || [] : [];
-    updateUI();
+    updateReceivers();
 });
 
-meSelect.addEventListener('change', updateUI);
-receiverSelect.addEventListener('change', updateUI);
+meSelect.addEventListener('change', updateReceivers);
+receiverSelect.addEventListener('change', updateAmount);
 
-function updateUI() {
+function updateReceivers() {
     const me = meSelect.value;
     if (!me) return;
 
     const owed = debts.filter(d => d.from === me);
 
     receiverSelect.innerHTML = '';
-    let total = 0;
 
-    owed.forEach(d => {
-        total += d.amount;
+    const uniqueReceivers = [...new Set(owed.map(d => d.to))];
 
-        if (![...receiverSelect.options].some(o => o.value === d.to)) {
-            const opt = document.createElement('option');
-            opt.value = d.to;
-            opt.textContent = d.to;
-            receiverSelect.appendChild(opt);
-        }
+    uniqueReceivers.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        receiverSelect.appendChild(opt);
     });
 
-    amountText.textContent = total.toFixed(2);
+    updateAmount();
+}
+
+function updateAmount() {
+    const me = meSelect.value;
+    const to = receiverSelect.value;
+    if (!me || !to) {
+        amountText.textContent = '0.00';
+        return;
+    }
+
+    const amount = debts
+        .filter(d => d.from === me && d.to === to)
+        .reduce((sum, d) => sum + d.amount, 0);
+
+    amountText.textContent = amount.toFixed(2);
 }
 
 payBtn.addEventListener('click', () => {
