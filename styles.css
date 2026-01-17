@@ -332,7 +332,19 @@ body {
     color: #d57304;
     border-top: 1px solid #d57304;
 }
-
+.btn {
+    padding: 11px;
+    background-color: #d57304;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
 /* Mobile Responsiveness */
 @media (max-width: 600px) {
