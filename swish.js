@@ -80,7 +80,7 @@ function updateAmount() {
 }
 
 payBtn.addEventListener('click', () => {
-    const me = meSelect.value;
+    // const me = meSelect.value;
     const to = receiverSelect.value;
     const amount = parseFloat(amountText.textContent);
 

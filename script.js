@@ -308,6 +308,7 @@ document.getElementById('debtForm').addEventListener('submit', async (e) => {
     const from = debtFrom.value;
     const to = debtTo.value;
     const amount = parseFloat(debtAmount.value);
+    const message = debtMessage.value.trim();
 
     if (from === to) {
         alert('Kan inte vara samma person');
@@ -318,6 +319,7 @@ document.getElementById('debtForm').addEventListener('submit', async (e) => {
         from,
         to,
         amount,
+        message,
         date: new Date().toISOString()
     };
 
@@ -326,6 +328,7 @@ document.getElementById('debtForm').addEventListener('submit', async (e) => {
     });
 
     debtAmount.value = '';
+    debtMessage.value = '';
 });
 
 
