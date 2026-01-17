@@ -323,9 +323,9 @@ body {
     flex: 1;
     border: none;
     background: none;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
-    color: #000000;
+    color: #b8b8b8;
 }
 
 .nav-btn.active {
