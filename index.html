@@ -13,6 +13,7 @@
 </head>
 <body>
     <script type="module" src="script.js"></script>
+    <script type="module" src="swish.js"></script>
     <div id="splash">
         <img src="images/web-app-manifest-512x512.png" alt="Loading">
     </div>
@@ -36,10 +37,29 @@
 
         <!-- TAB: SKULDER -->
         <section class="tab" id="tab-debts">
-            <div class="debts-section">
-                <h3>Skulder till kontot</h3>
-                <div id="debtsSummary">Loading...</div>
+            <div class="label">Betala skuld</div>
+
+            <div class="swish-card">
+            <label class="swish-label">
+                Vem är du?
+                <select id="meSelect" class="swish-select"></select>
+            </label>
+
+            <label class="swish-label">
+                Betala till
+                <select id="receiverSelect" class="swish-select"></select>
+            </label>
+
+            <div class="swish-amount">
+                <span class="swish-amount-label">Belopp</span>
+                <span class="swish-amount-value">
+                <span id="amountText">0</span> kr
+                </span>
             </div>
+
+            <button id="payBtn" class="btn swish-pay-btn">Betala</button>
+            </div>
+
         </section>
 
         <!-- TAB: LÄGG TILL -->
@@ -63,11 +83,32 @@
                     </select>
                     <button type="submit">Lägg till</button>
                 </form>
+                
+                <h3>Skapa skuld mellan personer</h3>
+                <form id="debtForm">
+                <select id="debtFrom" required>
+                    <option value="" disabled selected>Vem är skyldig?</option>
+                    <option value="David">David</option>
+                    <option value="Julius">Julius</option>
+                    <option value="Alvin">Alvin</option>
+                </select>
+
+                <select id="debtTo" required>
+                    <option value="" disabled selected>Till vem?</option>
+                    <option value="David">David</option>
+                    <option value="Julius">Julius</option>
+                    <option value="Alvin">Alvin</option>
+                </select>
+
+                <input type="number" id="debtAmount" placeholder="Belopp" step="0.01" min="0" required>
+
+                <button type="submit">Lägg till skuld</button>
+                </form>
             </div>
         </section>
     </div>
     <nav class="bottom-nav">
-        <!-- <a href="swish.html" class="nav-btn" data-tab="debts">Sug mig</a> -->
+        <button class="nav-btn" data-tab="debts">Lägg till</button>
         <button class="nav-btn active" data-tab="saldo">Saldo</button>
         <button class="nav-btn" data-tab="add">Lägg till</button>
     </nav>

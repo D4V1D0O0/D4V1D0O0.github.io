@@ -9,8 +9,11 @@ const firebaseConfig = {
     appId: "1:330775555909:web:e644773610112ef007182c"
 };
 
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const debtsRef = doc(db, 'Saldo', 'Debts');
+let debts = [];
 
 let startingBalance = 0;
 let purchases = [];
@@ -76,6 +79,12 @@ function loadData() {
         console.error('Error loading purchases:', error);
         document.getElementById('balance').textContent = 'Fel: ' + error.message;
     });
+
+    // Load Debts
+    onSnapshot(debtsRef, (snapshot) => {
+        debts = snapshot.exists() ? snapshot.data().entries || [] : [];
+    });
+        
 }
 
 function displayBalance() {
@@ -292,6 +301,33 @@ document.getElementById('expenseForm').addEventListener('submit', function(e) {
     //     updateFormToggleLabel();
     // }
 });
+
+document.getElementById('debtForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const from = debtFrom.value;
+    const to = debtTo.value;
+    const amount = parseFloat(debtAmount.value);
+
+    if (from === to) {
+        alert('Kan inte vara samma person');
+        return;
+    }
+
+    const entry = {
+        from,
+        to,
+        amount,
+        date: new Date().toISOString()
+    };
+
+    await updateDoc(debtsRef, {
+        entries: arrayUnion(entry)
+    });
+
+    debtAmount.value = '';
+});
+
 
 const tabs = document.querySelectorAll('.tab');
 const navButtons = document.querySelectorAll('.nav-btn');
