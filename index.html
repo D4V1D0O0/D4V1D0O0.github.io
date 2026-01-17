@@ -57,7 +57,7 @@
                 </span>
             </div>
 
-            <button id="payBtn" class="btn swish-pay-btn">Betala</button>
+            <button id="payBtn" class="btn swish-pay-btn">Betala <img src="images/swish-logo.svg" alt="" height="20px"></button>
             </div>
 
         </section>
@@ -86,23 +86,23 @@
                 
                 <h3>Skapa skuld mellan personer</h3>
                 <form id="debtForm">
-                <select id="debtFrom" required>
-                    <option value="" disabled selected>Vem är skyldig?</option>
-                    <option value="David">David</option>
-                    <option value="Julius">Julius</option>
-                    <option value="Alvin">Alvin</option>
-                </select>
+                    <select id="debtFrom" required>
+                        <option value="" disabled selected>Vem är skyldig?</option>
+                        <option value="David">David</option>
+                        <option value="Julius">Julius</option>
+                        <option value="Alvin">Alvin</option>
+                    </select>
 
-                <select id="debtTo" required>
-                    <option value="" disabled selected>Till vem?</option>
-                    <option value="David">David</option>
-                    <option value="Julius">Julius</option>
-                    <option value="Alvin">Alvin</option>
-                </select>
+                    <select id="debtTo" required>
+                        <option value="" disabled selected>Till vem?</option>
+                        <option value="David">David</option>
+                        <option value="Julius">Julius</option>
+                        <option value="Alvin">Alvin</option>
+                    </select>
 
-                <input type="number" id="debtAmount" placeholder="Belopp" step="0.01" min="0" required>
+                    <input type="number" id="debtAmount" placeholder="Belopp" step="0.01" min="0" required>
 
-                <button type="submit">Lägg till skuld</button>
+                    <button type="button" id="addDebtBtn">Lägg till skuld</button>
                 </form>
             </div>
         </section>
