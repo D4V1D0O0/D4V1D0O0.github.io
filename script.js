@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-import { getFirestore, collection, doc, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDeUOT-hWKgAnAtlwRFujoOpJNDP_WljoE",
@@ -9,11 +9,9 @@ const firebaseConfig = {
     appId: "1:330775555909:web:e644773610112ef007182c"
 };
 
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const debtsRef = doc(db, 'Saldo', 'Debts');
-let debts = [];
 
 let startingBalance = 0;
 let purchases = [];
@@ -24,41 +22,35 @@ function formatAmount(value) {
     if (typeof value !== 'number' || isNaN(value)) {
         value = 0;
     }
-    // Swedish-style formatting: 9 000,00 (space as thousands separator, comma as decimal)
     return value.toLocaleString('sv-SE', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
 }
 
-// --- Mobile viewport height fix (for proper 100vh on mobile) ---
+// Mobile viewport height fix
 function setViewportHeight() {
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
 setViewportHeight();
 window.addEventListener('resize', setViewportHeight);
-// --- End viewport fix ---
 
 function loadData() {
-    // Load Starting Balance
     const startingBalanceRef = doc(db, 'Saldo', 'StartingBalance');
     onSnapshot(startingBalanceRef, (snapshot) => {
         if (snapshot.exists()) {
             startingBalance = snapshot.data().Amount || 0;
             console.log('Starting balance loaded:', startingBalance);
         }
-
         startingBalanceLoaded = true;
         displayBalance();
         hideSplashWhenReady();
-
     }, (error) => {
         console.error('Error loading starting balance:', error);
         document.getElementById('startingBalance').textContent = 'Fel: ' + error.message;
     });
     
-    // Load Purchases
     const purchasesRef = doc(db, 'Saldo', 'Purchases');
     onSnapshot(purchasesRef, (snapshot) => {
         if (snapshot.exists()) {
@@ -68,23 +60,15 @@ function loadData() {
             purchases = [];
             console.log('Purchases document does not exist');
         }
-
         purchasesLoaded = true;
         displayBalance();
         displayEntries();
         displayDebts();
         hideSplashWhenReady();
-
     }, (error) => {
         console.error('Error loading purchases:', error);
         document.getElementById('balance').textContent = 'Fel: ' + error.message;
     });
-
-    // Load Debts
-    onSnapshot(debtsRef, (snapshot) => {
-        debts = snapshot.exists() ? snapshot.data().entries || [] : [];
-    });
-        
 }
 
 function displayBalance() {
@@ -129,16 +113,13 @@ function displayEntries() {
     
     const sortedEntries = [...purchases].reverse();
     sortedEntries.forEach((entry, reversedIndex) => {
-        // Calculate the original index
         const originalIndex = purchases.length - 1 - reversedIndex;
         
         let dateStr = '';
         if (entry.Date) {
             if (entry.Date.toDate) {
-                // Firebase Timestamp
                 dateStr = entry.Date.toDate().toLocaleString('sv-SE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
             } else if (typeof entry.Date === 'string') {
-                // ISO string
                 dateStr = new Date(entry.Date).toLocaleString('sv-SE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
             }
         }
@@ -163,7 +144,6 @@ function displayEntries() {
         if (personalValue > 0) {
             const personalText = formatAmount(personalValue) + ' kr';
             if (payer) {
-                // detailsParts.push(`Privat: ${personalText} (${payer} är skyldig ${personalText})`);
                 detailsParts.push(`Privat: ${personalText} (${payer})`);
             } else {
                 detailsParts.push(`Privat: ${personalText}`);
@@ -198,35 +178,7 @@ function deleteEntry(index) {
     displayDebts();
 }
 
-// Make functions available globally for onclick handlers
 window.deleteEntry = deleteEntry;
-
-// --- Collapsible expense form toggle ---
-const formSection = document.querySelector('.form-section');
-const expenseFormEl = document.getElementById('expenseForm');
-const toggleFormButton = document.getElementById('toggleFormButton');
-
-// if (window.innerWidth <= 600) {
-//     formSection.classList.remove('form-open');
-//     updateFormToggleLabel();
-// }
-
-// function updateFormToggleLabel() {
-//     if (!toggleFormButton || !formSection) return;
-//     const isOpen = formSection.classList.contains('form-open');
-//     toggleFormButton.textContent = isOpen ? 'Dölj formulär' : '+ Lägg till utgift';
-// }
-
-// if (toggleFormButton && formSection) {
-//     toggleFormButton.addEventListener('click', () => {
-//         formSection.classList.toggle('form-open');
-//         updateFormToggleLabel();
-//     });
-
-//     // Ensure correct initial label
-//     updateFormToggleLabel();
-// }
-// --- End collapsible form toggle ---
 
 function saveData() {
     const purchasesRef = doc(db, 'Saldo', 'Purchases');
@@ -236,6 +188,30 @@ function saveData() {
     console.log('Data saved to Firestore');
 }
 
+// Form toggle functionality for "Lägg till" tab
+const toggleToExpense = document.getElementById('toggleToExpense');
+const toggleToDebt = document.getElementById('toggleToDebt');
+const expenseForm = document.getElementById('expenseForm');
+const debtForm = document.getElementById('debtForm');
+
+function switchAddForm(showExpense) {
+    if (showExpense) {
+        expenseForm.classList.add('active');
+        debtForm.classList.remove('active');
+        toggleToExpense.classList.add('active');
+        toggleToDebt.classList.remove('active');
+    } else {
+        expenseForm.classList.remove('active');
+        debtForm.classList.add('active');
+        toggleToExpense.classList.remove('active');
+        toggleToDebt.classList.add('active');
+    }
+}
+
+toggleToExpense.addEventListener('click', () => switchAddForm(true));
+toggleToDebt.addEventListener('click', () => switchAddForm(false));
+
+// Expense form submission
 document.getElementById('expenseForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -274,7 +250,6 @@ document.getElementById('expenseForm').addEventListener('submit', function(e) {
 
     const newEntry = {
         Type: item,
-        // Cost is the shared part, used for saldo-beräkning (bakåtkompatibelt)
         Cost: sharedAmount,
         TotalCost: totalAmount,
         PersonalCost: personalAmount,
@@ -290,25 +265,21 @@ document.getElementById('expenseForm').addEventListener('submit', function(e) {
     displayEntries();
     displayDebts();
     
+    // Clear form
     document.getElementById('itemInput').value = '';
     document.getElementById('totalAmountInput').value = '';
     document.getElementById('personalAmountInput').value = '';
     document.getElementById('payerSelect').value = '';
-
-    // On small screens, collapse the form after adding an expense to keep focus on the list
-    // if (window.innerWidth <= 600 && formSection) {
-    //     formSection.classList.remove('form-open');
-    //     updateFormToggleLabel();
-    // }
 });
 
+// Debt form submission
 document.getElementById('debtForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const from = debtFrom.value;
-    const to = debtTo.value;
-    const amount = parseFloat(debtAmount.value);
-    const message = debtMessage.value.trim();
+    const from = document.getElementById('debtFrom').value;
+    const to = document.getElementById('debtTo').value;
+    const amount = parseFloat(document.getElementById('debtAmount').value);
+    const message = document.getElementById('debtMessage').value.trim();
 
     if (from === to) {
         alert('Kan inte vara samma person');
@@ -327,11 +298,14 @@ document.getElementById('debtForm').addEventListener('submit', async (e) => {
         entries: arrayUnion(entry)
     });
 
-    debtAmount.value = '';
-    debtMessage.value = '';
+    // Clear form
+    document.getElementById('debtAmount').value = '';
+    document.getElementById('debtMessage').value = '';
+    document.getElementById('debtTo').value = '';
+    document.getElementById('debtFrom').value = '';
 });
 
-
+// Tab navigation
 const tabs = document.querySelectorAll('.tab');
 const navButtons = document.querySelectorAll('.nav-btn');
 
@@ -351,7 +325,6 @@ navButtons.forEach(btn => {
     });
 });
 
-
 function hideSplashWhenReady() {
     if (!startingBalanceLoaded || !purchasesLoaded) return;
 
@@ -359,10 +332,7 @@ function hideSplashWhenReady() {
     if (!splash) return;
 
     splash.classList.add('hidden');
-
-    // Remove from DOM after fade-out
     setTimeout(() => splash.remove(), 700);
 }
 
-// Load data on page load
 loadData();

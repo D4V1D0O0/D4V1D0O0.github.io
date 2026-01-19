@@ -40,38 +40,38 @@
             <div class="label">Betala skuld</div>
 
             <div class="swish-card">
-            <label class="swish-label">
-                Vem är du?
-                <select id="meSelect" class="swish-select"></select>
-            </label>
+                <label class="swish-label">
+                    Vem är du?
+                    <select id="meSelect" class="swish-select"></select>
+                </label>
 
-            <label class="swish-label">
-                Betala till
-                <select id="receiverSelect" class="swish-select"></select>
-            </label>
+                <label class="swish-label">
+                    Betala till
+                    <select id="receiverSelect" class="swish-select"></select>
+                </label>
 
-            <div class="swish-amount">
-                <span class="swish-amount-label">Belopp</span>
-                <span class="swish-amount-value">
-                <span id="amountText">0</span> kr
-                </span>
+                <div class="swish-amount">
+                    <span class="swish-amount-label">Belopp</span>
+                    <span class="swish-amount-value">
+                        <span id="amountText">0</span> kr
+                    </span>
+                </div>
+
+                <button id="payBtn" class="btn swish-pay-btn">Betala <img src="images/swish-logo.svg" alt="" height="20px"></button>
             </div>
-
-            <button id="payBtn" class="btn swish-pay-btn">Betala <img src="images/swish-logo.svg" alt="" height="20px"></button>
-            </div>
-
         </section>
 
         <!-- TAB: LÄGG TILL -->
         <section class="tab" id="tab-add">
-            <div class="form-section form-open">
-                <div class="form-header">
-                    <h3>Lägg till utgift</h3>
-                    <!-- <button type="button" id="toggleFormButton" class="form-toggle-button">
-                        Dölj formulär
-                    </button> -->
+            <div class="label">Lägg till</div>
+
+            <div class="add-form-container">
+                <div class="form-toggle-container">
+                    <button type="button" id="toggleToExpense" class="form-type-btn active">Utgift</button>
+                    <button type="button" id="toggleToDebt" class="form-type-btn">Skuld</button>
                 </div>
-                <form id="expenseForm">
+
+                <form id="expenseForm" class="add-form active">
                     <input type="text" id="itemInput" placeholder="Vad köpte du?" required>
                     <input type="number" id="totalAmountInput" placeholder="Totalbelopp" step="0.01" min="0" required>
                     <input type="number" id="personalAmountInput" placeholder="Privat del" step="0.01" min="0">
@@ -81,29 +81,25 @@
                         <option value="Julius">Julius</option>
                         <option value="Alvin">Alvin</option>
                     </select>
-                    <button type="submit">Lägg till</button>
+                    <button type="submit" class="btn btn-submit">Lägg till</button>
                 </form>
-                
-                <h3>Skapa skuld mellan personer</h3>
-                <form id="debtForm">
-                    <select id="debtFrom" required>
-                        <option value="" disabled selected>Vem är skyldig?</option>
-                        <option value="David">David</option>
-                        <option value="Julius">Julius</option>
-                        <option value="Alvin">Alvin</option>
-                    </select>
 
+                <form id="debtForm" class="add-form">
                     <select id="debtTo" required>
-                        <option value="" disabled selected>Till vem?</option>
+                        <option value="" disabled selected>Vem är du?</option>
                         <option value="David">David</option>
                         <option value="Julius">Julius</option>
                         <option value="Alvin">Alvin</option>
                     </select>
-
+                    <select id="debtFrom" required>
+                        <option value="" disabled selected>Vem är skyldig dig?</option>
+                        <option value="David">David</option>
+                        <option value="Julius">Julius</option>
+                        <option value="Alvin">Alvin</option>
+                    </select>
                     <input type="number" id="debtAmount" placeholder="Belopp" step="0.01" min="0" required>
-                    <input type="text" id="debtMessage" placeholder="Vad köpte du?" required>
-
-                    <button type="submit" id="addDebtBtn">Lägg till skuld</button>
+                    <input type="text" id="debtMessage" placeholder="Meddelande" required>
+                    <button type="submit" class="btn btn-submit">Lägg till</button>
                 </form>
             </div>
         </section>

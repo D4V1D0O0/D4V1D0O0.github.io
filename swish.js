@@ -78,45 +78,40 @@ function createPaymentModal() {
 }
 
 function getUnpaidDebts() {
-    // Calculate unpaid debts by subtracting payments from debts
+    // For each debtor-creditor pair, find the latest payment and only include debts after that
     const debtsMap = {};
     
-    // Add all debts
+    // Add all debts organized by key
     allDebts.forEach(debt => {
         const key = `${debt.from}-${debt.to}`;
         if (!debtsMap[key]) {
             debtsMap[key] = { from: debt.from, to: debt.to, amount: 0, debts: [], unpaidDebts: [] };
         }
-        debtsMap[key].amount += debt.amount;
         debtsMap[key].debts.push(debt);
     });
     
-    // Subtract payments and track which debts are unpaid
-    payments.forEach(payment => {
-        const key = `${payment.from}-${payment.to}`;
-        if (debtsMap[key]) {
-            debtsMap[key].amount -= payment.amount;
-        }
-    });
-    
-    // Determine which individual debts are unpaid
+    // For each pair, find latest payment timestamp and filter debts
     Object.keys(debtsMap).forEach(key => {
         const record = debtsMap[key];
-        let remainingAmount = record.amount;
         
-        // Sort debts by date (oldest first) and mark as unpaid until remaining amount is 0
-        const sortedDebts = [...record.debts].sort((a, b) => new Date(a.date) - new Date(b.date));
-        record.unpaidDebts = [];
+        // Find the latest payment for this pair
+        const latestPaymentTime = payments
+            .filter(p => p.from === record.from && p.to === record.to)
+            .reduce((latest, p) => {
+                const paymentTime = new Date(p.date).getTime();
+                return paymentTime > latest ? paymentTime : latest;
+            }, 0);
         
-        for (const debt of sortedDebts) {
-            if (remainingAmount > 0) {
-                record.unpaidDebts.push(debt);
-                remainingAmount -= debt.amount;
-            }
-        }
+        // Only include debts created after the latest payment
+        record.unpaidDebts = record.debts.filter(debt => {
+            return new Date(debt.date).getTime() > latestPaymentTime;
+        });
+        
+        // Calculate total unpaid amount
+        record.amount = record.unpaidDebts.reduce((sum, d) => sum + d.amount, 0);
     });
     
-    // Return only positive (unpaid) amounts
+    // Return only pairs with unpaid amounts
     return Object.values(debtsMap).filter(d => d.amount > 0);
 }
 

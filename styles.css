@@ -103,11 +103,113 @@ body {
     margin-bottom: 25px;
     font-weight: 500;
 }
+/* ===== FORM STYLES FOR ADD TAB ===== */
+.add-form-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-top: 20px;
+}
+
+.form-toggle-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.form-type-btn {
+    flex: 1;
+    padding: 12px 16px;
+    background-color: rgba(213, 115, 4, 0.1);
+    border: 1px solid rgba(213, 115, 4, 0.3);
+    border-radius: 8px;
+    color: #b8b8b8;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-type-btn:hover {
+    background-color: rgba(213, 115, 4, 0.2);
+    border-color: rgba(213, 115, 4, 0.5);
+}
+
+.form-type-btn.active {
+    background-color: #d57304;
+    color: white;
+    border-color: #d57304;
+}
+
+.add-form {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 0;
+}
+
+.add-form.active {
+    display: flex;
+}
+
+.add-form input,
+.add-form select {
+    padding: 11px 14px;
+    border: 1px solid rgba(213, 115, 4, 0.3);
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: rgba(31, 31, 31, 0.6);
+    color: #e0e0e0;
+    transition: all 0.3s ease;
+    height: 44px;
+    box-sizing: border-box;
+}
+
+.add-form input:focus,
+.add-form select:focus {
+    outline: none;
+    border-color: #d57304;
+    background-color: rgba(31, 31, 31, 0.9);
+    box-shadow: 0 0 8px rgba(213, 115, 4, 0.2);
+}
+
+.add-form input::placeholder {
+    color: #707070;
+}
+
+.btn-submit {
+    padding: 12px;
+    background-color: #d57304;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 8px;
+}
+
+.btn-submit:hover {
+    background-color: #a85803;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(213, 115, 4, 0.3);
+}
+
+/* Obsolete form styles - kept for backwards compatibility if needed */
 .form-section {
     border-top: 1px solid rgba(213, 115, 4, 0.2);
     padding-top: 25px;
     margin-bottom: 25px;
 }
+
 .form-section h3 {
     margin: 0 0 15px 0;
     font-size: 15px;
@@ -116,6 +218,7 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
 .form-section form {
     display: flex;
     flex-direction: column;
@@ -129,6 +232,7 @@ body {
     gap: 8px;
     margin-bottom: 8px;
 }
+
 .form-toggle-button {
     padding: 6px 10px;
     background-color: transparent;
@@ -141,6 +245,7 @@ body {
     letter-spacing: 0.5px;
     cursor: pointer;
 }
+
 .form-toggle-button:hover {
     background-color: rgba(213, 115, 4, 0.1);
 }
@@ -155,6 +260,7 @@ body {
     color: #e0e0e0;
     transition: all 0.3s ease;
 }
+
 .form-section input:focus,
 .form-section select:focus {
     outline: none;
@@ -162,6 +268,7 @@ body {
     background-color: rgba(31, 31, 31, 0.9);
     box-shadow: 0 0 8px rgba(213, 115, 4, 0.2);
 }
+
 .form-section input::placeholder {
     color: #707070;
 }
@@ -171,6 +278,7 @@ body {
     padding-top: 16px;
     margin-bottom: 8px;
 }
+
 .debts-section h3 {
     margin: 0 0 8px 0;
     font-size: 14px;
@@ -179,10 +287,12 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
 #debtsSummary {
     font-size: 12px;
     color: #e0e0e0;
 }
+
 .debt-item {
     margin-bottom: 4px;
 }
@@ -192,6 +302,7 @@ body {
     font-size: 11px;
     color: #c7c7c7;
 }
+
 .form-section button {
     padding: 11px;
     background-color: #d57304;
@@ -205,6 +316,7 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
 .form-section button:hover {
     background-color: #a85803;
     transform: translateY(-2px);
