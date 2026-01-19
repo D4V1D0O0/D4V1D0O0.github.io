@@ -72,7 +72,7 @@
                 </div>
 
                 <form id="expenseForm" class="add-form active">
-                    <input type="text" id="itemInput" placeholder="Vad köpte du?" required>
+                    <input type="text" id="itemInput" placeholder="Vad köptes? (Kortfattat)" required>
                     <input type="number" id="totalAmountInput" placeholder="Totalbelopp" step="0.01" min="0" required>
                     <input type="number" id="personalAmountInput" placeholder="Privat del" step="0.01" min="0">
                     <select id="payerSelect" required>
@@ -103,6 +103,36 @@
                 </form>
             </div>
         </section>
+
+        <!-- Edit Entry Modal -->
+        <div id="editEntryModal" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Redigera utgift</h2>
+                </div>
+                <div class="modal-body">
+                    <form id="editEntryForm">
+                        <label>
+                            Vad köpte du?
+                            <input type="text" id="editItemInput" required>
+                        </label>
+                        <label>
+                            Totalbelopp
+                            <input type="number" id="editTotalAmountInput" step="0.01" min="0" required>
+                        </label>
+                        <label>
+                            Privat del
+                            <input type="number" id="editPersonalAmountInput" step="0.01" min="0">
+                        </label>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="editCancelBtn" class="btn btn-secondary">Avbryt</button>
+                    <button id="editDeleteBtn" class="btn btn-danger">Radera</button>
+                    <button id="editSaveBtn" class="btn btn-primary">Spara</button>
+                </div>
+            </div>
+        </div>
     </div>
     <nav class="bottom-nav">
         <button class="nav-btn" data-tab="debts">Skulder</button>

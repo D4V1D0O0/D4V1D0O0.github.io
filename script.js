@@ -162,7 +162,7 @@ function displayEntries() {
             </div>
             <div class="entry-footer">
                 <span class="entry-date">${dateStr}</span>
-                <button class="delete-btn" onclick="deleteEntry(${originalIndex})">Radera</button>
+                <button class="edit-btn" onclick="openEditModal(${originalIndex})">Redigera</button>
             </div>
             ${detailsHtml}
         `;
@@ -334,5 +334,93 @@ function hideSplashWhenReady() {
     splash.classList.add('hidden');
     setTimeout(() => splash.remove(), 700);
 }
+
+// Edit entry functionality
+let editingIndex = null;
+
+function openEditModal(index) {
+    editingIndex = index;
+    const entry = purchases[index];
+    
+    document.getElementById('editItemInput').value = entry.Type || '';
+    document.getElementById('editTotalAmountInput').value = entry.TotalCost || 0;
+    document.getElementById('editPersonalAmountInput').value = entry.PersonalCost || 0;
+    
+    document.getElementById('editEntryModal').classList.add('active');
+}
+
+function closeEditModal() {
+    document.getElementById('editEntryModal').classList.remove('active');
+    editingIndex = null;
+}
+
+function saveEditEntry() {
+    if (editingIndex === null || editingIndex < 0 || editingIndex >= purchases.length) {
+        alert('Utgiftens index är ogiltigt');
+        return;
+    }
+
+    const item = document.getElementById('editItemInput').value;
+    const totalAmount = parseFloat(document.getElementById('editTotalAmountInput').value);
+    const personalRaw = document.getElementById('editPersonalAmountInput').value;
+    const personalAmount = personalRaw === '' ? 0 : parseFloat(personalRaw);
+
+    if (!item.trim()) {
+        alert('Skriv vad du köpte.');
+        return;
+    }
+
+    if (isNaN(totalAmount) || totalAmount <= 0) {
+        alert('Totalbelopp måste vara större än 0.');
+        return;
+    }
+
+    if (isNaN(personalAmount) || personalAmount < 0) {
+        alert('Privat del kan inte vara negativ.');
+        return;
+    }
+
+    if (personalAmount > totalAmount) {
+        alert('Den privata delen kan inte vara större än totalbeloppet.');
+        return;
+    }
+
+    const sharedAmount = totalAmount - personalAmount;
+
+    // Update the entry
+    purchases[editingIndex].Type = item;
+    purchases[editingIndex].TotalCost = totalAmount;
+    purchases[editingIndex].PersonalCost = personalAmount;
+    purchases[editingIndex].Cost = sharedAmount;
+    purchases[editingIndex].SharedCost = sharedAmount;
+
+    saveData();
+    displayBalance();
+    displayEntries();
+    displayDebts();
+    closeEditModal();
+}
+
+document.getElementById('editCancelBtn').addEventListener('click', closeEditModal);
+document.getElementById('editSaveBtn').addEventListener('click', saveEditEntry);
+document.getElementById('editDeleteBtn').addEventListener('click', () => {
+    if (editingIndex !== null) {
+        const entry = purchases[editingIndex];
+        const confirmed = confirm(`Är du säker på att du vill radera "${entry.Type}"?`);
+        if (confirmed) {
+            deleteEntry(editingIndex);
+            closeEditModal();
+        }
+    }
+});
+
+// Close modal when clicking outside
+document.getElementById('editEntryModal').addEventListener('click', (e) => {
+    if (e.target.id === 'editEntryModal') {
+        closeEditModal();
+    }
+});
+
+window.openEditModal = openEditModal;
 
 loadData();
