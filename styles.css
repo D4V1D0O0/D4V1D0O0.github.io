@@ -576,9 +576,102 @@ body {
     font-size: 15px;
 }
 
-/* Mobile fine-tuning */
-@media (max-width: 600px) {
-    .swish-amount-value {
-        font-size: 32px;
+/* Payment Modal Styles */
+.payment-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.payment-modal-overlay.active {
+    display: flex;
+}
+
+.payment-modal {
+    background-color: #2a0f1a;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    max-width: 90%;
+    width: 400px;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
     }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.payment-modal-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(213, 115, 4, 0.2);
+}
+
+.payment-modal-header h2 {
+    margin: 0;
+    color: #d57304;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.payment-modal-body {
+    padding: 20px;
+    color: #e0e0e0;
+    line-height: 1.6;
+}
+
+.payment-modal-body p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.payment-modal-footer {
+    padding: 15px 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    border-top: 1px solid rgba(213, 115, 4, 0.2);
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #d57304;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #a85803;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(213, 115, 4, 0.3);
+}
+
+.btn-secondary {
+    background-color: #555;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #777;
+    transform: translateY(-2px);
 }

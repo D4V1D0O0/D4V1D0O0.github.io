@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDeUOT-hWKgAnAtlwRFujoOpJNDP_WljoE",
@@ -24,7 +24,8 @@ const receiverSelect = document.getElementById('receiverSelect');
 const amountText = document.getElementById('amountText');
 const payBtn = document.getElementById('payBtn');
 
-let debts = [];
+let allDebts = [];
+let payments = [];
 
 // Populate "me"
 Object.keys(roommates).forEach(name => {
@@ -37,18 +38,77 @@ Object.keys(roommates).forEach(name => {
 // Load debts
 const debtsRef = doc(db, 'Saldo', 'Debts');
 onSnapshot(debtsRef, snap => {
-    debts = snap.exists() ? snap.data().entries || [] : [];
+    allDebts = snap.exists() ? snap.data().entries || [] : [];
+    payments = snap.exists() ? snap.data().payments || [] : [];
     updateReceivers();
 });
 
 meSelect.addEventListener('change', updateReceivers);
 receiverSelect.addEventListener('change', updateAmount);
 
+function createPaymentModal() {
+    if (document.getElementById('paymentModal')) {
+        return;
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'paymentModal';
+    modal.className = 'payment-modal-overlay';
+    modal.innerHTML = `
+        <div class="payment-modal">
+            <div class="payment-modal-header">
+                <h2>Bekräfta Betalning</h2>
+            </div>
+            <div class="payment-modal-body">
+                <p id="paymentModalMessage"></p>
+            </div>
+            <div class="payment-modal-footer">
+                <button id="paymentCancelBtn" class="btn btn-secondary">Avbryt</button>
+                <button id="paymentConfirmBtn" class="btn btn-primary">Bekräfta</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const cancelBtn = document.getElementById('paymentCancelBtn');
+    const confirmBtn = document.getElementById('paymentConfirmBtn');
+
+    cancelBtn.addEventListener('click', cancelPayment);
+    confirmBtn.addEventListener('click', confirmPayment);
+}
+
+function getUnpaidDebts() {
+    // Calculate unpaid debts by subtracting payments from debts
+    const debtsMap = {};
+    
+    // Add all debts
+    allDebts.forEach(debt => {
+        const key = `${debt.from}-${debt.to}`;
+        if (!debtsMap[key]) {
+            debtsMap[key] = { from: debt.from, to: debt.to, amount: 0, debts: [] };
+        }
+        debtsMap[key].amount += debt.amount;
+        debtsMap[key].debts.push(debt);
+    });
+    
+    // Subtract payments
+    payments.forEach(payment => {
+        const key = `${payment.from}-${payment.to}`;
+        if (debtsMap[key]) {
+            debtsMap[key].amount -= payment.amount;
+        }
+    });
+    
+    // Return only positive (unpaid) amounts
+    return Object.values(debtsMap).filter(d => d.amount > 0);
+}
+
 function updateReceivers() {
     const me = meSelect.value;
     if (!me) return;
 
-    const owed = debts.filter(d => d.from === me);
+    const unpaidDebts = getUnpaidDebts();
+    const owed = unpaidDebts.filter(d => d.from === me);
 
     receiverSelect.innerHTML = '';
 
@@ -72,15 +132,15 @@ function updateAmount() {
         return;
     }
 
-    const amount = debts
-        .filter(d => d.from === me && d.to === to)
-        .reduce((sum, d) => sum + d.amount, 0);
+    const unpaidDebts = getUnpaidDebts();
+    const debt = unpaidDebts.find(d => d.from === me && d.to === to);
+    const amount = debt ? debt.amount : 0;
 
     amountText.textContent = amount.toFixed(2);
 }
 
 payBtn.addEventListener('click', () => {
-    // const me = meSelect.value;
+    const me = meSelect.value;
     const to = receiverSelect.value;
     const amount = parseFloat(amountText.textContent);
 
@@ -89,16 +149,134 @@ payBtn.addEventListener('click', () => {
         return;
     }
 
-    openSwish(roommates[to], amount);
+    // Get the debt record to aggregate messages
+    const unpaidDebts = getUnpaidDebts();
+    const debtRecord = unpaidDebts.find(d => d.from === me && d.to === to);
+    
+    if (!debtRecord) {
+        alert('Kunde inte hitta skulden');
+        return;
+    }
+
+    // Aggregate messages from all debts between me and to
+    const messages = debtRecord.debts
+        .map(d => d.message)
+        .filter(m => m && m.trim());
+    const message = messages.length > 0 ? messages.join(' + ') : 'Betalning av skuld';
+
+    // Store payment info for confirmation
+    window.pendingPayment = {
+        from: me,
+        to: to,
+        amount: amount,
+        message: message,
+        timestamp: new Date().toISOString()
+    };
+
+    openSwish(roommates[to], amount, message);
+    showPaymentModal(me, to, amount);
 });
 
-function openSwish(phone, amount) {
+function openSwish(phone, amount, message) {
     const swishData = {
         version: 1,
         payee: { value: phone.replace(/^0/, '+46') },
         amount: { value: Math.round(amount) },
-        message: { value: 'Skuld' }
+        message: { value: message }
     };
 
     window.location.href = 'swish://payment?data=' + encodeURIComponent(JSON.stringify(swishData));
 }
+
+function showPaymentModal(payer, receiver, expectedAmount) {
+    createPaymentModal();
+    
+    const modal = document.getElementById('paymentModal');
+    const messageEl = document.getElementById('paymentModalMessage');
+    const confirmBtn = document.getElementById('paymentConfirmBtn');
+    
+    messageEl.innerHTML = `
+        <strong>Från:</strong> ${payer}<br>
+        <strong>Till:</strong> ${receiver}<br>
+        <strong>Belopp:</strong> ${expectedAmount.toFixed(2)} kr<br><br>
+        <span style="font-size: 12px; color: #999;">Bekräfta att du har genomfört Swish-betalningen</span>
+    `;
+    
+    confirmBtn.dataset.payer = payer;
+    confirmBtn.dataset.receiver = receiver;
+    confirmBtn.dataset.expectedAmount = expectedAmount;
+    
+    modal.classList.add('active');
+}
+
+async function confirmPayment() {
+    if (!window.pendingPayment) {
+        alert('Ingen betalning att bekräfta');
+        hidePaymentModal();
+        return;
+    }
+
+    const confirmBtn = document.getElementById('paymentConfirmBtn');
+    const payer = confirmBtn.dataset.payer;
+    const receiver = confirmBtn.dataset.receiver;
+    const expectedAmount = parseFloat(confirmBtn.dataset.expectedAmount);
+    const actualAmount = window.pendingPayment.amount;
+
+    // Check if payment amount matches expected debt amount
+    if (Math.abs(actualAmount - expectedAmount) > 0.01) {
+        const mismatchWarning = `Varning: Belopp stämmer inte!\n\n` +
+            `Förväntad skuld: ${expectedAmount.toFixed(2)} kr\n` +
+            `Betalat belopp: ${actualAmount.toFixed(2)} kr\n\n` +
+            `Vill du fortsätta ändå?`;
+        
+        if (!confirm(mismatchWarning)) {
+            return;
+        }
+    }
+
+    try {
+        const payment = {
+            from: payer,
+            to: receiver,
+            amount: actualAmount,
+            date: window.pendingPayment.timestamp
+        };
+
+        // Add payment to database
+        await updateDoc(debtsRef, {
+            payments: arrayUnion(payment)
+        });
+
+        alert('Betalning bekräftad!');
+        hidePaymentModal();
+        updateReceivers();
+    } catch (error) {
+        console.error('Error confirming payment:', error);
+        alert('Fel vid bekräftelse av betalning: ' + error.message);
+    }
+}
+
+function cancelPayment() {
+    hidePaymentModal();
+}
+
+function hidePaymentModal() {
+    const modal = document.getElementById('paymentModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+    window.pendingPayment = null;
+}
+
+// Auto-hide confirm button after a period of inactivity
+setInterval(() => {
+    const confirmBtn = document.getElementById('confirmPaymentBtn');
+    if (confirmBtn && confirmBtn.style.display !== 'none') {
+        const now = new Date().getTime();
+        const paymentTime = new Date(window.pendingPayment?.timestamp).getTime();
+        // Hide if more than 5 minutes have passed since payment was initiated
+        if (now - paymentTime > 5 * 60 * 1000) {
+            hidePaymentConfirmButton();
+        }
+    }
+}, 30000); // Check every 30 seconds
