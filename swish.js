@@ -85,17 +85,34 @@ function getUnpaidDebts() {
     allDebts.forEach(debt => {
         const key = `${debt.from}-${debt.to}`;
         if (!debtsMap[key]) {
-            debtsMap[key] = { from: debt.from, to: debt.to, amount: 0, debts: [] };
+            debtsMap[key] = { from: debt.from, to: debt.to, amount: 0, debts: [], unpaidDebts: [] };
         }
         debtsMap[key].amount += debt.amount;
         debtsMap[key].debts.push(debt);
     });
     
-    // Subtract payments
+    // Subtract payments and track which debts are unpaid
     payments.forEach(payment => {
         const key = `${payment.from}-${payment.to}`;
         if (debtsMap[key]) {
             debtsMap[key].amount -= payment.amount;
+        }
+    });
+    
+    // Determine which individual debts are unpaid
+    Object.keys(debtsMap).forEach(key => {
+        const record = debtsMap[key];
+        let remainingAmount = record.amount;
+        
+        // Sort debts by date (oldest first) and mark as unpaid until remaining amount is 0
+        const sortedDebts = [...record.debts].sort((a, b) => new Date(a.date) - new Date(b.date));
+        record.unpaidDebts = [];
+        
+        for (const debt of sortedDebts) {
+            if (remainingAmount > 0) {
+                record.unpaidDebts.push(debt);
+                remainingAmount -= debt.amount;
+            }
         }
     });
     
@@ -158,8 +175,8 @@ payBtn.addEventListener('click', () => {
         return;
     }
 
-    // Aggregate messages from all debts between me and to
-    const messages = debtRecord.debts
+    // Aggregate messages from UNPAID debts only
+    const messages = debtRecord.unpaidDebts
         .map(d => d.message)
         .filter(m => m && m.trim());
     const message = messages.length > 0 ? messages.join(' + ') : 'Betalning av skuld';
@@ -174,7 +191,7 @@ payBtn.addEventListener('click', () => {
     };
 
     openSwish(roommates[to], amount, message);
-    showPaymentModal(me, to, amount);
+    showPaymentModal(me, to, amount, message);
 });
 
 function openSwish(phone, amount, message) {
@@ -188,7 +205,7 @@ function openSwish(phone, amount, message) {
     window.location.href = 'swish://payment?data=' + encodeURIComponent(JSON.stringify(swishData));
 }
 
-function showPaymentModal(payer, receiver, expectedAmount) {
+function showPaymentModal(payer, receiver, expectedAmount, message) {
     createPaymentModal();
     
     const modal = document.getElementById('paymentModal');
@@ -198,7 +215,8 @@ function showPaymentModal(payer, receiver, expectedAmount) {
     messageEl.innerHTML = `
         <strong>Från:</strong> ${payer}<br>
         <strong>Till:</strong> ${receiver}<br>
-        <strong>Belopp:</strong> ${expectedAmount.toFixed(2)} kr<br><br>
+        <strong>Belopp:</strong> ${expectedAmount.toFixed(2)} kr<br>
+        <strong>Meddelande:</strong> ${message}<br><br>
         <span style="font-size: 12px; color: #999;">Bekräfta att du har genomfört Swish-betalningen</span>
     `;
     
