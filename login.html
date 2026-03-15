@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>BΩNG house - Logga in</title>
+    <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <link rel="shortcut icon" href="/images/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+    <link rel="manifest" href="/images/site.webmanifest" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-page">
+
+    <div class="login-wrapper">
+        <div class="login-header">
+            <img src="images/web-app-manifest-512x512.png" alt="Saldo" class="login-logo">
+            <div class="login-title">B<span>Ω</span>NG house</div>
+            <div class="login-subtitle">&mdash; Logga in &mdash;</div>
+        </div>
+
+        <div class="login-card">
+            <span class="name-label">Vem är du?</span>
+            <div class="name-grid">
+                <button class="name-btn" data-name="David">David</button>
+                <button class="name-btn" data-name="Julius">Julius</button>
+                <button class="name-btn" data-name="Alvin">Alvin</button>
+            </div>
+
+            <div class="field-group">
+                <label class="login-field-label" for="passwordInput">Lösenord</label>
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        id="passwordInput"
+                        class="password-input"
+                        placeholder="Skriv ditt lösenord..."
+                        autocomplete="current-password"
+                    >
+                    <button class="toggle-pw" id="togglePw" tabindex="-1" aria-label="Visa/dölj lösenord">
+                        <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="error-msg" id="errorMsg">Fel lösenord. Försök igen.</div>
+
+            <button class="login-btn" id="loginBtn">Logga in</button>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>
