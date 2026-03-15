@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
 import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+import { notifyPurchaseAdded, notifyDebtAdded } from './telegram.js';
 
 const firebaseConfig = {
     apiKey: "AIzaSyDeUOT-hWKgAnAtlwRFujoOpJNDP_WljoE",
@@ -261,6 +262,8 @@ document.getElementById('expenseForm').addEventListener('submit', function(e) {
     purchases.push(newEntry);
     
     saveData();
+    // After purchases.push(newEntry); saveData(); etc.
+    notifyPurchaseAdded(newEntry, payer);
     displayBalance();
     displayEntries();
     displayDebts();
@@ -297,6 +300,8 @@ document.getElementById('debtForm').addEventListener('submit', async (e) => {
     await updateDoc(debtsRef, {
         entries: arrayUnion(entry)
     });
+    // After await updateDoc(debtsRef, { entries: arrayUnion(entry) });
+    notifyDebtAdded(entry, localStorage.getItem('saldo_user'));
 
     // Clear form
     document.getElementById('debtAmount').value = '';
