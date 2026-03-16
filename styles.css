@@ -741,7 +741,6 @@ select.field-input option {
     font-size: 28px;
     color: var(--accent);
     letter-spacing: 1px;
-    filter: drop-shadow(0 0 8px rgba(213,115,4,0.3));
 }
 
 .swish-pay-btn {

@@ -1,6 +1,7 @@
 // ============================================================
 // telegram.js
-// Sends Telegram messages when a purchase or debt is added.
+// Sends Telegram messages when a purchase, debt, or laundry
+// booking is added.
 //
 // No server needed — calls the Telegram Bot API directly
 // from the browser using fetch().
@@ -31,7 +32,7 @@ const ALL_USERS = Object.keys(CHAT_IDS);
 
 /**
  * Sends a Telegram message to a single user.
- * Uses MarkdownV2 formatting for bold/italic support.
+ * Uses HTML formatting for bold/italic support.
  *
  * @param {string} userName  - "David", "Julius", or "Alvin"
  * @param {string} message   - Plain text message to send
@@ -126,21 +127,11 @@ export async function notifyDebtAdded(entry, addedBy) {
     await sendMessage(entry.from, text);
 }
 
-// ── INTERNAL ──────────────────────────────────────────────────
-
-function formatAmount(value) {
-    if (typeof value !== "number" || isNaN(value)) return "?";
-    return value.toLocaleString("sv-SE", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-}
-
 /**
  * Called when a debt is removed.
  * Notifies the person who owed the debt that it has been cancelled.
  *
- * @param {object} entry   - The debt entry that was removed { from, to, amount, message }
+ * @param {object} entry     - The debt entry that was removed { from, to, amount, message }
  * @param {string} removedBy - Name of the logged-in user who removed it
  */
 export async function notifyDebtRemoved(entry, removedBy) {
@@ -154,4 +145,64 @@ export async function notifyDebtRemoved(entry, removedBy) {
         `Du behöver inte betala denna skuld längre.`;
 
     await sendMessage(entry.from, text);
+}
+
+/**
+ * Called when a new OPEN laundry booking is created.
+ * Notifies all other users in the household so they can join.
+ *
+ * @param {object} booking  - The new booking { date, slot, open, bookedBy }
+ * @param {string} addedBy  - Name of the user who created the booking
+ */
+export async function notifyLaundryBooked(booking, addedBy) {
+    const dateLabel = formatBookingDate(booking.date);
+
+    const text =
+        `<b>🧺 Ny öppen tvättid</b>\n` +
+        `<b>${addedBy}</b> har bokat en tid som alla kan gå med i:\n` +
+        `📅 ${dateLabel}\n` +
+        `⏰ ${booking.slot}\n` +
+        `Öppna appen för att gå med!`;
+
+    const recipients = ALL_USERS.filter(u => u !== addedBy);
+    await sendToMany(recipients, text);
+}
+
+/**
+ * Called when a user joins an existing open laundry booking.
+ * Notifies the booking owner (and other participants) that someone joined.
+ *
+ * @param {object} booking  - The booking being joined
+ * @param {string} joinedBy - Name of the user who joined
+ */
+export async function notifyLaundryJoined(booking, joinedBy) {
+    const dateLabel = formatBookingDate(booking.date);
+
+    const text =
+        `<b>🧺 Någon gick med i din tvättid</b>\n` +
+        `<b>${joinedBy}</b> har gått med i din bokning:\n` +
+        `📅 ${dateLabel}\n` +
+        `⏰ ${booking.slot}`;
+
+    // Notify the booking owner
+    const recipients = [booking.bookedBy, ...(booking.participants || [])]
+        .filter(u => u !== joinedBy);
+
+    await sendToMany([...new Set(recipients)], text);
+}
+
+// ── INTERNAL ──────────────────────────────────────────────────
+
+function formatAmount(value) {
+    if (typeof value !== "number" || isNaN(value)) return "?";
+    return value.toLocaleString("sv-SE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+/** Formats "YYYY-MM-DD" into a readable Swedish date string */
+function formatBookingDate(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long' });
 }
