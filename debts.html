@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>BΩNG house — Skulder</title>
+    <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <link rel="shortcut icon" href="/images/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+    <link rel="manifest" href="/images/site.webmanifest" />
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        if (!localStorage.getItem('saldo_user')) window.location.replace('login.html');
+    </script>
+</head>
+<body>
+    <script type="module" src="swish.js"></script>
+    <script type="module" src="debts.js"></script>
+
+    <header class="top-bar">
+        <a href="index.html" class="back-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Hem
+        </a>
+        <span class="top-bar-title">B<span>Ω</span>NG house</span>
+        <div style="width:70px"></div>
+    </header>
+
+    <div class="container subpage-container">
+
+        <div class="subpage-header">
+            <h1 class="subpage-title">Skulder</h1>
+        </div>
+
+        <div class="swish-user-banner">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Inloggad som <strong id="swishCurrentUser">—</strong>
+        </div>
+
+        <!-- Swish payment card -->
+        <div class="section-card swish-card">
+            <label class="field-label">
+                Betala till
+                <select id="receiverSelect" class="field-input"></select>
+            </label>
+            <div class="swish-amount-row">
+                <span class="swish-amount-label">Din skuld</span>
+                <span class="swish-amount-value"><span id="amountText">0.00</span> kr</span>
+            </div>
+            <p id="swishNoDebt" class="swish-no-debt" style="display:none;">Inga skulder att betala &#127881;</p>
+            <button id="payBtn" class="btn btn-primary swish-pay-btn">
+                Betala med
+                <img src="images/swish-logo.svg" alt="Swish" height="18">
+            </button>
+        </div>
+
+        <!-- Debts you have added (removable) -->
+        <div class="section-card entries-card">
+            <div class="section-card-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                Skulder du har lagt till
+            </div>
+            <p class="chores-hint">Du kan bara ta bort skulder som du själv lade till.</p>
+            <div id="myDebtsList" class="debts-removable-list"></div>
+            <p id="myDebtsEmpty" class="chores-empty" style="display:none;">Du har inte lagt till några skulder</p>
+        </div>
+
+        <!-- hidden — kept for swish.js compatibility -->
+        <select id="meSelect" style="display:none;"></select>
+
+    </div>
+
+    <!-- Swish payment confirmation modal (swish.js populates the body) -->
+    <div id="paymentModal" class="modal-overlay payment-modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Bekräfta betalning</h2>
+            </div>
+            <div class="modal-body payment-modal-body">
+                <p id="paymentModalMessage"></p>
+            </div>
+            <div class="modal-footer payment-modal-footer">
+                <button id="paymentCancelBtn" class="btn btn-secondary">Avbryt</button>
+                <button id="paymentConfirmBtn" class="btn btn-primary">Bekräfta</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Shared app modal (used by modal.js instead of alert/confirm) -->
+    <div id="appModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="appModalTitle">Meddelande</h2>
+            </div>
+            <div class="modal-body">
+                <p id="appModalMessage" style="color:var(--text-dim);font-size:14px;line-height:1.6;"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="appModalCancel" class="btn btn-secondary">Avbryt</button>
+                <button id="appModalConfirm" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="portrait-lock">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        <p>Rotera till stående läge</p>
+    </div>
+
+    <script>
+        if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {});
+        const user = localStorage.getItem('saldo_user') || '';
+        const swishBanner = document.getElementById('swishCurrentUser');
+        if (swishBanner) swishBanner.textContent = user;
+        const meSelect = document.getElementById('meSelect');
+        if (meSelect) {
+            const opt = document.createElement('option');
+            opt.value = user; opt.textContent = user; opt.selected = true;
+            meSelect.appendChild(opt);
+        }
+
+        // Wire payment modal buttons — swish.js skips adding these when
+        // it finds a pre-built #paymentModal, so we add them here instead.
+        document.addEventListener('DOMContentLoaded', () => {
+            const cancelBtn  = document.getElementById('paymentCancelBtn');
+            const confirmBtn = document.getElementById('paymentConfirmBtn');
+            if (cancelBtn)  cancelBtn.addEventListener('click',  () => {
+                document.getElementById('paymentModal')?.classList.remove('active');
+                window.pendingPayment = null;
+            });
+            if (confirmBtn) confirmBtn.addEventListener('click',  () => {
+                // swish.js attaches confirmPayment via its own addEventListener in createPaymentModal
+                // but since we pre-built the modal, we need to call it via the global
+                if (typeof confirmPayment === 'function') confirmPayment();
+            });
+        });
+    </script>
+</body>
+</html>

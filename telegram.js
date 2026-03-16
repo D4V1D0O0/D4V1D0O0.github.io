@@ -97,7 +97,7 @@ export async function notifyPurchaseAdded(entry, addedBy) {
     const total  = formatAmount(entry.TotalCost);
 
     const message =
-        `💸 <b>Nytt köp registrerat</b>\n\n` +
+        `<b>Nytt köp registrerat</b>\n` +
         `<b>${addedBy}</b> lade till:\n` +
         `📦 ${item}\n` +
         `💰 Totalt: ${total} kr\n`;
@@ -134,4 +134,24 @@ function formatAmount(value) {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
+}
+
+/**
+ * Called when a debt is removed.
+ * Notifies the person who owed the debt that it has been cancelled.
+ *
+ * @param {object} entry   - The debt entry that was removed { from, to, amount, message }
+ * @param {string} removedBy - Name of the logged-in user who removed it
+ */
+export async function notifyDebtRemoved(entry, removedBy) {
+    const amount  = formatAmount(entry.amount);
+    const message = entry.message ? ` (${entry.message})` : "";
+
+    const text =
+        `<b>Skuld borttagen</b>\n` +
+        `<b>${removedBy}</b> tog bort din skuld:\n` +
+        `💰 ${amount} kr${message}\n` +
+        `Du behöver inte betala denna skuld längre.`;
+
+    await sendMessage(entry.from, text);
 }

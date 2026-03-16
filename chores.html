@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>BΩNG house — Sysslor</title>
+    <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <link rel="shortcut icon" href="/images/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+    <link rel="manifest" href="/images/site.webmanifest" />
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        if (!localStorage.getItem('saldo_user')) window.location.replace('login.html');
+    </script>
+</head>
+<body>
+    <script type="module" src="chores.js"></script>
+
+    <header class="top-bar">
+        <a href="index.html" class="back-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Hem
+        </a>
+        <span class="top-bar-title">B<span>Ω</span>NG house</span>
+        <div style="width:70px"></div>
+    </header>
+
+    <div class="container subpage-container">
+
+        <!-- Page header -->
+        <div class="subpage-header">
+            <h1 class="subpage-title">Sysslor</h1>
+            <button id="manageChoresBtn" class="btn-ghost">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Hantera
+            </button>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="section-card chores-leaderboard-card">
+            <div class="section-card-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/></svg>
+                Poängliga
+            </div>
+            <div id="leaderboard" class="chores-leaderboard"></div>
+        </div>
+
+        <!-- Chore list — tap to log -->
+        <div class="section-card">
+            <div class="section-card-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Logga en syssla
+            </div>
+            <p class="chores-hint">Tryck på en syssla för att logga den åt dig</p>
+            <div id="choresList" class="chores-list"></div>
+            <p id="choresEmpty" class="chores-empty" style="display:none;">
+                Inga sysslor ännu — lägg till via Hantera &#127881;
+            </p>
+        </div>
+
+        <!-- Recent activity log -->
+        <div class="section-card entries-card chores-log-card">
+            <div class="section-card-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Senaste aktivitet
+            </div>
+            <div id="choreLog" class="chores-log-list"></div>
+            <p id="logEmpty" class="chores-empty" style="display:none;">Ingen aktivitet ännu</p>
+        </div>
+
+    </div>
+
+    <!-- Manage chores modal -->
+    <div id="manageModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Hantera sysslor</h2>
+                <button class="modal-close-btn" id="manageCloseBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Add new chore form -->
+                <form id="addChoreForm" class="chore-add-form">
+                    <div class="form-field">
+                        <label class="field-label" for="choreNameInput">Syssla</label>
+                        <input type="text" id="choreNameInput" class="field-input" placeholder="T.ex. Ta ut soporna" required>
+                    </div>
+                    <div class="form-field">
+                        <label class="field-label" for="chorePointsInput">Poäng</label>
+                        <input type="number" id="chorePointsInput" class="field-input" placeholder="T.ex. 10" min="1" max="100" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-submit">Lägg till syssla</button>
+                </form>
+
+                <div class="chore-manage-divider">
+                    <span>Befintliga sysslor</span>
+                </div>
+
+                <!-- List of existing chores to delete -->
+                <div id="manageChoresList" class="chore-manage-list"></div>
+                <p id="manageEmpty" class="chores-empty" style="display:none;">Inga sysslor att visa</p>
+
+                <div class="chore-manage-divider" style="margin-top:20px;">
+                    <span>Farlig zon</span>
+                </div>
+                <button onclick="openResetModal()" class="btn btn-danger" style="width:100%;">
+                    Nollställ alla poäng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset points confirmation modal -->
+    <div id="resetModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Nollställ poäng</h2>
+                <button class="modal-close-btn" id="resetCloseBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="color:var(--text-dim);font-size:14px;line-height:1.6;">
+                    Detta nollställer alla poäng för alla användare och rensar aktivitetsloggen. Sysslorna påverkas inte. Åtgärden kan inte ångras.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button id="resetCancelBtn" class="btn btn-secondary">Avbryt</button>
+                <button id="resetConfirmBtn" class="btn btn-danger">Nollställ allt</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Shared app modal (used by modal.js instead of alert/confirm) -->
+    <div id="appModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="appModalTitle">Meddelande</h2>
+            </div>
+            <div class="modal-body">
+                <p id="appModalMessage" style="color:var(--text-dim);font-size:14px;line-height:1.6;"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="appModalCancel" class="btn btn-secondary">Avbryt</button>
+                <button id="appModalConfirm" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="portrait-lock">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        <p>Rotera till stående läge</p>
+    </div>
+    <script>
+        if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {});
+    </script>
+</body>
+</html>

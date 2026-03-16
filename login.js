@@ -1,27 +1,27 @@
-// ── PASSWORDS ─────────────────────────────────────────────────────────────
-// Change these to whatever passwords you want for each person.
-const PASSWORDS = {
-    David:  "David123",
-    Julius: "Julius123",
-    Alvin:  "Johnnybravo67"
-};
-// ──────────────────────────────────────────────────────────────────────────
+// ============================================================
+// login.js
+// Handles the login page. Passwords are loaded from Firestore
+// and verified against SHA-256 hashes via auth.js.
+// ============================================================
 
-// If already logged in, go straight to the app
+import { verifyPassword } from './auth.js';
+
+// Redirect if already logged in
 if (localStorage.getItem('saldo_user')) {
     window.location.replace('index.html');
 }
 
 let selectedName = null;
 
-const nameBtns     = document.querySelectorAll('.name-btn');
+const nameBtns      = document.querySelectorAll('.name-btn');
 const passwordInput = document.getElementById('passwordInput');
-const loginBtn     = document.getElementById('loginBtn');
-const errorMsg     = document.getElementById('errorMsg');
-const togglePw     = document.getElementById('togglePw');
-const eyeIcon      = document.getElementById('eyeIcon');
+const loginBtn      = document.getElementById('loginBtn');
+const errorMsg      = document.getElementById('errorMsg');
+const togglePw      = document.getElementById('togglePw');
+const eyeIcon       = document.getElementById('eyeIcon');
 
-// Name selection
+// ── Name selection ────────────────────────────────────────────
+
 nameBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         nameBtns.forEach(b => b.classList.remove('selected'));
@@ -32,7 +32,8 @@ nameBtns.forEach(btn => {
     });
 });
 
-// Toggle password visibility
+// ── Password visibility toggle ────────────────────────────────
+
 togglePw.addEventListener('click', () => {
     const isHidden = passwordInput.type === 'password';
     passwordInput.type = isHidden ? 'text' : 'password';
@@ -44,8 +45,9 @@ togglePw.addEventListener('click', () => {
            <circle cx="12" cy="12" r="3"/>`;
 });
 
-// Login attempt
-function attemptLogin() {
+// ── Login ─────────────────────────────────────────────────────
+
+async function attemptLogin() {
     errorMsg.classList.remove('visible');
 
     if (!selectedName) {
@@ -55,11 +57,25 @@ function attemptLogin() {
     }
 
     const pw = passwordInput.value;
-    if (pw === PASSWORDS[selectedName]) {
+    if (!pw) {
+        errorMsg.textContent = 'Skriv ditt lösenord.';
+        errorMsg.classList.add('visible');
+        return;
+    }
+
+    // Disable button while we check Firestore
+    loginBtn.disabled    = true;
+    loginBtn.textContent = 'Loggar in…';
+
+    const ok = await verifyPassword(selectedName, pw);
+
+    if (ok) {
         localStorage.setItem('saldo_user', selectedName);
         window.location.replace('index.html');
     } else {
-        passwordInput.value = '';
+        loginBtn.disabled    = false;
+        loginBtn.textContent = 'Logga in';
+        passwordInput.value  = '';
         errorMsg.textContent = 'Fel lösenord. Försök igen.';
         errorMsg.classList.add('visible');
         passwordInput.focus();

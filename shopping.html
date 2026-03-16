@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>BΩNG house — Inköpslista</title>
+    <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <link rel="shortcut icon" href="/images/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+    <link rel="manifest" href="/images/site.webmanifest" />
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        if (!localStorage.getItem('saldo_user')) window.location.replace('login.html');
+    </script>
+</head>
+<body>
+    <script type="module" src="shopping.js"></script>
+
+    <header class="top-bar">
+        <a href="index.html" class="back-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Hem
+        </a>
+        <span class="top-bar-title">B<span>Ω</span>NG house</span>
+        <div style="width:70px"></div>
+    </header>
+
+    <div class="container subpage-container">
+
+        <div class="subpage-header">
+            <h1 class="subpage-title">Inköpslista</h1>
+            <button id="clearCheckedBtn" class="btn-ghost">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                Rensa ikryssade
+            </button>
+        </div>
+
+        <!-- Add item form -->
+        <form id="shoppingForm" class="shopping-add-form">
+            <input
+                type="text"
+                id="shoppingInput"
+                class="field-input shopping-input"
+                placeholder="Lägg till vara..."
+                autocomplete="off"
+            >
+            <button type="submit" class="btn btn-primary shopping-add-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+        </form>
+
+        <!-- Shopping list -->
+        <div class="section-card entries-card shopping-card">
+            <div class="section-card-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                Varor
+                <span id="itemCount" class="shopping-count"></span>
+            </div>
+            <ul id="shoppingList" class="shopping-list"></ul>
+            <p id="shoppingEmpty" class="shopping-empty" style="display:none;">
+                Listan är tom — lägg till något ovan &#127881;
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- Shared app modal (used by modal.js instead of alert/confirm) -->
+    <div id="appModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="appModalTitle">Meddelande</h2>
+            </div>
+            <div class="modal-body">
+                <p id="appModalMessage" style="color:var(--text-dim);font-size:14px;line-height:1.6;"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="appModalCancel" class="btn btn-secondary">Avbryt</button>
+                <button id="appModalConfirm" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="portrait-lock">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        <p>Rotera till stående läge</p>
+    </div>
+    <script>
+        if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {});
+    </script>
+</body>
+</html>

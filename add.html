@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>BΩNG house — Lägg till</title>
+    <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <link rel="shortcut icon" href="/images/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+    <link rel="manifest" href="/images/site.webmanifest" />
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        if (!localStorage.getItem('saldo_user')) window.location.replace('login.html');
+    </script>
+</head>
+<body>
+    <script type="module" src="script.js"></script>
+
+    <header class="top-bar">
+        <a href="index.html" class="back-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Hem
+        </a>
+        <span class="top-bar-title">B<span>Ω</span>NG house</span>
+        <div style="width:70px"></div>
+    </header>
+
+    <div class="container subpage-container">
+
+        <div class="subpage-header">
+            <h1 class="subpage-title">Lägg till</h1>
+        </div>
+
+        <div class="form-toggle-container" style="flex-shrink:0;">
+            <button type="button" id="toggleToExpense" class="form-type-btn active">Utgift</button>
+            <button type="button" id="toggleToDebt" class="form-type-btn">Skuld</button>
+        </div>
+
+        <div class="add-form-scroll">
+            <form id="expenseForm" class="add-form active">
+                <div class="form-field">
+                    <label class="field-label" for="itemInput">Vad köptes?</label>
+                    <input type="text" id="itemInput" class="field-input" placeholder="T.ex. Matvaror" required>
+                </div>
+                <div class="form-field">
+                    <label class="field-label" for="totalAmountInput">Totalbelopp</label>
+                    <input type="number" id="totalAmountInput" class="field-input" placeholder="0.00" step="0.01" min="0" required>
+                </div>
+                <div class="form-field">
+                    <label class="field-label" for="personalAmountInput">Privat del <span class="field-hint">(valfritt)</span></label>
+                    <input type="number" id="personalAmountInput" class="field-input" placeholder="0.00" step="0.01" min="0">
+                </div>
+                <div class="form-field">
+                    <label class="field-label" for="payerSelect">Vem betalade?</label>
+                    <select id="payerSelect" class="field-input" required>
+                        <option value="" disabled selected>Välj person</option>
+                        <option value="David">David</option>
+                        <option value="Julius">Julius</option>
+                        <option value="Alvin">Alvin</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-submit">Lägg till utgift</button>
+            </form>
+
+            <form id="debtForm" class="add-form">
+                <div class="swish-user-banner">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Lägger till skuld som <strong id="debtCurrentUser">—</strong>
+                </div>
+                <!-- hidden — kept for script.js compatibility -->
+                <select id="debtTo" style="display:none;"></select>
+                <div class="form-field">
+                    <label class="field-label" for="debtFrom">Vem är skyldig dig?</label>
+                    <select id="debtFrom" class="field-input" required>
+                        <option value="" disabled selected>Välj person</option>
+                        <option value="David">David</option>
+                        <option value="Julius">Julius</option>
+                        <option value="Alvin">Alvin</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label class="field-label" for="debtAmount">Belopp</label>
+                    <input type="number" id="debtAmount" class="field-input" placeholder="0.00" step="0.01" min="0" required>
+                </div>
+                <div class="form-field">
+                    <label class="field-label" for="debtMessage">Meddelande</label>
+                    <input type="text" id="debtMessage" class="field-input" placeholder="T.ex. el för mars" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-submit">Lägg till skuld</button>
+            </form>
+        </div>
+
+    </div>
+
+
+    <!-- Shared app modal (used by modal.js instead of alert/confirm) -->
+    <div id="appModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="appModalTitle">Meddelande</h2>
+            </div>
+            <div class="modal-body">
+                <p id="appModalMessage" style="color:var(--text-dim);font-size:14px;line-height:1.6;"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="appModalCancel" class="btn btn-secondary">Avbryt</button>
+                <button id="appModalConfirm" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="portrait-lock">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        <p>Rotera till stående läge</p>
+    </div>
+
+    <script>
+        if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {});
+
+        // Wire logged-in user
+        const user = localStorage.getItem('saldo_user') || '';
+        const debtBanner = document.getElementById('debtCurrentUser');
+        if (debtBanner) debtBanner.textContent = user;
+        const debtTo = document.getElementById('debtTo');
+        if (debtTo) {
+            const opt = document.createElement('option');
+            opt.value = user; opt.textContent = user; opt.selected = true;
+            debtTo.appendChild(opt);
+        }
+        const debtFrom = document.getElementById('debtFrom');
+        if (debtFrom) {
+            Array.from(debtFrom.options).forEach(o => { if (o.value === user) o.remove(); });
+        }
+    </script>
+</body>
+</html>

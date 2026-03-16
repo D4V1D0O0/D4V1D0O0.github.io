@@ -3,255 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>BΩNG house - Saldo</title>
+    <title>BΩNG house</title>
     <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
     <link rel="shortcut icon" href="/images/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
     <link rel="manifest" href="/images/site.webmanifest" />
     <link rel="stylesheet" href="styles.css">
-
-    <!-- Auth guard: redirect to login if not authenticated -->
     <script>
-        (function () {
-            if (!localStorage.getItem('saldo_user')) {
-                window.location.replace('login.html');
-            }
-        })();
+        if (!localStorage.getItem('saldo_user')) window.location.replace('login.html');
     </script>
 </head>
 <body>
+    <!-- script.js only to load balance onto the home page -->
     <script type="module" src="script.js"></script>
-    <script type="module" src="swish.js"></script>
 
-    <!-- Splash screen -->
-    <div id="splash">
-        <img src="images/web-app-manifest-512x512.png" alt="Loading">
-    </div>
+    <!-- Load leaderboard preview from chores data -->
+    <script type="module">
+        import { db } from './firebase.js';
+        import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-    <!-- Top bar -->
+        const ALL_USERS = ['David', 'Julius', 'Alvin'];
+        const MEDALS    = ['🥇', '🥈', '🥉'];
+        const currentUser = localStorage.getItem('saldo_user') || '';
+
+        onSnapshot(doc(db, 'Saldo', 'Chores'), (snap) => {
+            const el = document.getElementById('homeLeaderboard');
+            if (!el) return;
+
+            const scores = snap.exists() ? (snap.data().scores || {}) : {};
+            const sorted = ALL_USERS
+                .map(name => ({ name, pts: scores[name] || 0 }))
+                .filter(user => user.pts > 0)
+                .sort((a, b) => b.pts - a.pts);
+
+            el.innerHTML = '';
+
+            if (sorted.length === 0) {
+                el.innerHTML = '<span style="color:var(--text-muted);font-size:12px;">Ingen har poäng ännu</span>';
+                return;
+            }
+
+            sorted.forEach((user, i) => {
+                const isMe = user.name === currentUser;
+                const row  = document.createElement('div');
+                row.className = `home-lb-row${isMe ? ' home-lb-row-me' : ''}`;
+                row.innerHTML = `
+                    <span class="home-lb-medal">${MEDALS[i] || ''}</span>
+                    <span class="home-lb-name">${user.name}</span>
+                    <span class="home-lb-pts">${user.pts}<span class="home-lb-pts-unit">p</span></span>
+                `;
+                el.appendChild(row);
+            });
+        });
+    </script>
+
     <header class="top-bar">
         <div class="top-bar-brand">
             <img src="images/web-app-manifest-512x512.png" alt="logo" class="top-bar-logo">
             <span class="top-bar-title">B<span>Ω</span>NG house</span>
         </div>
-        <button class="logout-btn" onclick="localStorage.removeItem('saldo_user'); window.location.replace('login.html');">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            Logga ut
-        </button>
+        <a href="profile.html" class="top-bar-profile-btn" id="topBarProfileBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span id="topBarUserName"></span>
+        </a>
     </header>
 
-    <!-- Main content area -->
-    <div class="container">
+    <div class="container home-container">
 
-        <!-- TAB: SALDO -->
-        <section class="tab active" id="tab-saldo">
-            <div class="balance-card">
-                <div class="balance-label">Aktuellt Saldo</div>
-                <div class="balance-value" id="balance">Laddar...</div>
-                <div class="balance-starting" id="startingBalance">Startsaldo: Laddar...</div>
+        <!-- Balance card — same data from script.js -->
+        <div class="balance-card">
+            <div class="balance-label">Aktuellt Saldo</div>
+            <div class="balance-value" id="balance">Laddar...</div>
+            <div class="balance-starting" id="startingBalance">Startsaldo: Laddar...</div>
+        </div>
+
+        <!-- Leaderboard preview card -->
+        <div class="home-leaderboard-card section-card">
+            <div class="section-card-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/></svg>
+                Poängliga
+                <a href="chores.html" class="home-leaderboard-link">Visa allt →</a>
             </div>
-
-            <div class="section-card">
-                <div class="section-card-header">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    Skulder till kontot
-                </div>
-                <div id="debtsSummary" class="debts-list">Laddar...</div>
-            </div>
-
-            <div class="section-card entries-card">
-                <div class="section-card-header">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                    Utgifter
-                </div>
-                <div id="entriesList" class="entries-list"></div>
-            </div>
-        </section>
-
-        <!-- TAB: SKULDER -->
-        <section class="tab" id="tab-debts">
-            <div class="tab-page-label">Betala skuld</div>
-
-            <div class="swish-user-banner">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                Inloggad som <strong id="swishCurrentUser">—</strong>
-            </div>
-
-            <div class="section-card swish-card">
-                <label class="field-label">
-                    Betala till
-                    <select id="receiverSelect" class="field-input"></select>
-                </label>
-                <div class="swish-amount-row">
-                    <span class="swish-amount-label">Din skuld</span>
-                    <span class="swish-amount-value"><span id="amountText">0.00</span> kr</span>
-                </div>
-                <p id="swishNoDebt" class="swish-no-debt" style="display:none;">Inga skulder att betala &#127881;</p>
-                <button id="payBtn" class="btn btn-primary swish-pay-btn">
-                    Betala med
-                    <img src="images/swish-logo.svg" alt="Swish" height="18">
-                </button>
-            </div>
-
-            <!-- hidden — kept for swish.js compatibility -->
-            <select id="meSelect" style="display:none;"></select>
-        </section>
-
-        <!-- TAB: LÄGG TILL -->
-        <section class="tab" id="tab-add">
-            <div class="tab-page-label">Lägg till</div>
-
-            <div class="form-toggle-container">
-                <button type="button" id="toggleToExpense" class="form-type-btn active">Utgift</button>
-                <button type="button" id="toggleToDebt" class="form-type-btn">Skuld</button>
-            </div>
-
-            <div class="add-form-scroll">
-                <form id="expenseForm" class="add-form active">
-                    <div class="form-field">
-                        <label class="field-label" for="itemInput">Vad köptes?</label>
-                        <input type="text" id="itemInput" class="field-input" placeholder="T.ex. Matvaror" required>
-                    </div>
-                    <div class="form-field">
-                        <label class="field-label" for="totalAmountInput">Totalbelopp</label>
-                        <input type="number" id="totalAmountInput" class="field-input" placeholder="0.00" step="0.01" min="0" required>
-                    </div>
-                    <div class="form-field">
-                        <label class="field-label" for="personalAmountInput">Privat del <span class="field-hint">(valfritt)</span></label>
-                        <input type="number" id="personalAmountInput" class="field-input" placeholder="0.00" step="0.01" min="0">
-                    </div>
-                    <div class="form-field">
-                        <label class="field-label" for="payerSelect">Vem betalade?</label>
-                        <select id="payerSelect" class="field-input" required>
-                            <option value="" disabled selected>Välj person</option>
-                            <option value="David">David</option>
-                            <option value="Julius">Julius</option>
-                            <option value="Alvin">Alvin</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-submit">Lägg till utgift</button>
-                </form>
-
-                <form id="debtForm" class="add-form">
-                    <div class="swish-user-banner">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        Lägger till skuld som <strong id="debtCurrentUser">—</strong>
-                    </div>
-                    <!-- hidden — kept for script.js compatibility -->
-                    <select id="debtTo" style="display:none;"></select>
-                    <div class="form-field">
-                        <label class="field-label" for="debtFrom">Vem är skyldig dig?</label>
-                        <select id="debtFrom" class="field-input" required>
-                            <option value="" disabled selected>Välj person</option>
-                            <option value="David">David</option>
-                            <option value="Julius">Julius</option>
-                            <option value="Alvin">Alvin</option>
-                        </select>
-                    </div>
-                    <div class="form-field">
-                        <label class="field-label" for="debtAmount">Belopp</label>
-                        <input type="number" id="debtAmount" class="field-input" placeholder="0.00" step="0.01" min="0" required>
-                    </div>
-                    <div class="form-field">
-                        <label class="field-label" for="debtMessage">Meddelande</label>
-                        <input type="text" id="debtMessage" class="field-input" placeholder="T.ex. el för mars" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-submit">Lägg till skuld</button>
-                </form>
-            </div>
-        </section>
-
-        <!-- Edit Entry Modal -->
-        <div id="editEntryModal" class="modal-overlay">
-            <div class="modal">
-                <div class="modal-header">
-                    <h2>Redigera utgift</h2>
-                    <button class="modal-close-btn" id="editCancelBtn">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="editEntryForm">
-                        <div class="form-field">
-                            <label class="field-label" for="editItemInput">Vad köpte du?</label>
-                            <input type="text" id="editItemInput" class="field-input" required>
-                        </div>
-                        <div class="form-field">
-                            <label class="field-label" for="editTotalAmountInput">Totalbelopp</label>
-                            <input type="number" id="editTotalAmountInput" class="field-input" step="0.01" min="0" required>
-                        </div>
-                        <div class="form-field">
-                            <label class="field-label" for="editPersonalAmountInput">Privat del</label>
-                            <input type="number" id="editPersonalAmountInput" class="field-input" step="0.01" min="0">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button id="editDeleteBtn" class="btn btn-danger">Radera</button>
-                    <button id="editSaveBtn" class="btn btn-primary">Spara</button>
-                </div>
+            <div id="homeLeaderboard" class="home-leaderboard-rows">
+                <span style="color:var(--text-muted);font-size:12px;">Laddar...</span>
             </div>
         </div>
 
-    </div><!-- /container -->
+        <!-- Navigation grid -->
+        <nav class="home-grid">
 
-    <!-- Bottom navigation -->
-    <nav class="bottom-nav">
-        <button class="nav-btn" data-tab="debts">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            Skulder
-        </button>
-        <button class="nav-btn active" data-tab="saldo">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            Saldo
-        </button>
-        <button class="nav-btn" data-tab="add">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-            Lägg till
-        </button>
-    </nav>
-    <!-- Wire logged-in user into UI elements -->
+            <a href="purchases.html" class="grid-tile">
+                <div class="grid-tile-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+                        <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+                    </svg>
+                </div>
+                <span class="grid-tile-label">Utgifter</span>
+                <span class="grid-tile-sub">Se alla köp</span>
+            </a>
+
+            <a href="debts.html" class="grid-tile">
+                <div class="grid-tile-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+                    </svg>
+                </div>
+                <span class="grid-tile-label">Skulder</span>
+                <span class="grid-tile-sub">Hantera &amp; betala</span>
+            </a>
+
+            <a href="add.html" class="grid-tile grid-tile-accent">
+                <div class="grid-tile-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                </div>
+                <span class="grid-tile-label">Lägg till</span>
+                <span class="grid-tile-sub">Utgift eller skuld</span>
+            </a>
+
+            <a href="shopping.html" class="grid-tile">
+                <div class="grid-tile-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                </div>
+                <span class="grid-tile-label">Inköpslista</span>
+                <span class="grid-tile-sub">Allt som behövs</span>
+            </a>
+
+            <a href="chores.html" class="grid-tile grid-tile-chores">
+                <div class="grid-tile-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 11 12 14 22 4"/>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                    </svg>
+                </div>
+                <span class="grid-tile-label">Sysslor</span>
+                <span class="grid-tile-sub">Poängliga</span>
+            </a>
+
+            <!-- Admin tile — only visible to David, shown/hidden by JS below -->
+            <a href="admin.html" class="grid-tile grid-tile-admin" id="adminTile" style="display:none;">
+                <div class="grid-tile-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                </div>
+                <span class="grid-tile-label">Admin</span>
+                <span class="grid-tile-sub">Saldo &amp; reset</span>
+            </a>
+
+        </nav>
+
+        <footer class="home-footer">
+            <span class="login-footer-line"></span>
+            <!-- <span class="login-footer-text">ΑΣ ΤΟ ΣΤΕΙΛΟΥΜΕ</span> -->
+            <span class="login-footer-text">Let's get <span>sendy</span></span>
+            <span class="login-footer-line"></span>
+        </footer>
+
+    </div>
+
     <script>
-        (function () {
-            const user = localStorage.getItem('saldo_user') || '';
-
-            // Banners
-            const swishBanner = document.getElementById('swishCurrentUser');
-            if (swishBanner) swishBanner.textContent = user;
-
-            const debtBanner = document.getElementById('debtCurrentUser');
-            if (debtBanner) debtBanner.textContent = user;
-
-            // Pre-select hidden meSelect so swish.js keeps working unchanged
-            const meSelect = document.getElementById('meSelect');
-            if (meSelect) {
-                const opt = document.createElement('option');
-                opt.value = user;
-                opt.textContent = user;
-                opt.selected = true;
-                meSelect.appendChild(opt);
-            }
-
-            // Pre-select hidden debtTo so script.js keeps working unchanged
-            const debtTo = document.getElementById('debtTo');
-            if (debtTo) {
-                const opt = document.createElement('option');
-                opt.value = user;
-                opt.textContent = user;
-                opt.selected = true;
-                debtTo.appendChild(opt);
-            }
-
-            // Remove logged-in user from debtFrom so you can't pick yourself
-            const debtFrom = document.getElementById('debtFrom');
-            if (debtFrom) {
-                Array.from(debtFrom.options).forEach(o => {
-                    if (o.value === user) o.remove();
-                });
-            }
-        })();
+        // Show admin tile only for David, show name in top bar
+        const _u = localStorage.getItem('saldo_user') || '';
+        const _topName = document.getElementById('topBarUserName');
+        if (_topName && _u) _topName.textContent = _u;
+        if (_u === 'David') {
+            const _t = document.getElementById('adminTile');
+            if (_t) _t.style.display = '';
+        }
     </script>
 
+    <div id="portrait-lock">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        <p>Rotera till stående läge</p>
+    </div>
+    <script>
+        if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {});
+    </script>
 </body>
 </html>
