@@ -223,6 +223,7 @@ function showPaymentModal(payer, receiver, expectedAmount, message) {
 }
 
 async function confirmPayment() {
+
     if (!window.pendingPayment) {
         alert('Ingen betalning att bekräfta');
         hidePaymentModal();
@@ -232,22 +233,10 @@ async function confirmPayment() {
     const confirmBtn = document.getElementById('paymentConfirmBtn');
     const payer = confirmBtn.dataset.payer;
     const receiver = confirmBtn.dataset.receiver;
-    const expectedAmount = parseFloat(confirmBtn.dataset.expectedAmount);
     const actualAmount = window.pendingPayment.amount;
 
-    // Check if payment amount matches expected debt amount
-    if (Math.abs(actualAmount - expectedAmount) > 0.01) {
-        const mismatchWarning = `Varning: Belopp stämmer inte!\n\n` +
-            `Förväntad skuld: ${expectedAmount.toFixed(2)} kr\n` +
-            `Betalat belopp: ${actualAmount.toFixed(2)} kr\n\n` +
-            `Vill du fortsätta ändå?`;
-        
-        if (!confirm(mismatchWarning)) {
-            return;
-        }
-    }
-
     try {
+
         const payment = {
             from: payer,
             to: receiver,
@@ -255,7 +244,6 @@ async function confirmPayment() {
             date: window.pendingPayment.timestamp
         };
 
-        // Add payment to database
         await updateDoc(debtsRef, {
             payments: arrayUnion(payment)
         });
@@ -263,11 +251,15 @@ async function confirmPayment() {
         alert('Betalning bekräftad!');
         hidePaymentModal();
         updateReceivers();
+
     } catch (error) {
         console.error('Error confirming payment:', error);
         alert('Fel vid bekräftelse av betalning: ' + error.message);
     }
+
 }
+
+window.confirmPayment = confirmPayment;
 
 function cancelPayment() {
     hidePaymentModal();
@@ -283,13 +275,16 @@ function hidePaymentModal() {
 
 // Auto-hide confirm button after a period of inactivity
 setInterval(() => {
-    const confirmBtn = document.getElementById('confirmPaymentBtn');
-    if (confirmBtn && confirmBtn.style.display !== 'none') {
-        const now = new Date().getTime();
-        const paymentTime = new Date(window.pendingPayment?.timestamp).getTime();
-        // Hide if more than 5 minutes have passed since payment was initiated
-        if (now - paymentTime > 5 * 60 * 1000) {
-            hidePaymentConfirmButton();
-        }
+
+    const confirmBtn = document.getElementById('paymentConfirmBtn');
+
+    if (!confirmBtn || !window.pendingPayment?.timestamp) return;
+
+    const now = Date.now();
+    const paymentTime = new Date(window.pendingPayment.timestamp).getTime();
+
+    if (now - paymentTime > 5 * 60 * 1000) {
+        hidePaymentModal();
     }
-}, 30000); // Check every 30 seconds
+
+}, 30000);
