@@ -1,6 +1,7 @@
 import { db } from './firebase.js';
 import { showAlert, showConfirm } from './modal.js';
 import { doc, onSnapshot, updateDoc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+import { notifyPurchaseAdded, notifyDebtAdded } from './telegram.js';
 
 const purchasesRef = doc(db, 'Saldo', 'Purchases');
 const debtsRef     = doc(db, 'Saldo', 'Debts');
@@ -299,6 +300,7 @@ if (expenseForm) {
 
         purchases.push(newEntry);
         saveData();
+        notifyPurchaseAdded(newEntry, payer);
         displayBalance();
         displayEntries();
         displayDebts();
@@ -327,6 +329,7 @@ if (debtForm) {
 
         const entry = { id: uid(), from, to, amount, message, date: new Date().toISOString() };
         await updateDoc(debtsRef, { entries: arrayUnion(entry) });
+        notifyDebtAdded(entry, localStorage.getItem('saldo_user'));
 
         el('debtAmount').value  = '';
         el('debtMessage').value = '';
