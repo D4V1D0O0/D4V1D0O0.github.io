@@ -2356,3 +2356,48 @@ body.login-page::after {
     letter-spacing: 0.5px;
     line-height: 1;
 }
+
+
+/* laundry row */
+
+.laundry-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px solid var(--card-border);
+}
+
+.laundry-info{
+    text-align:left;
+}
+
+.laundry-label{
+    font-size:11px;
+    color:#8c8c92;
+}
+
+.laundry-time{
+    font-size:14px;
+    font-weight:600;
+}
+
+.laundry-user{
+    font-size:11px;
+    color:#8c8c92;
+}
+
+.laundry-btn{
+    background: var(--accent);
+    border:none;
+    color:#e6e6e6;
+    padding:8px 12px;
+    border-radius:8px;
+    font-size:12px;
+    cursor:pointer;
+}
+
+.laundry-btn:hover{
+    background: var(--accent-dark);
+}
