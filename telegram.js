@@ -20,7 +20,7 @@ const BOT_TOKEN = "8171107956:AAEWnR44YK9Zf8OK35S-UTzId7Nuu9Ta2TI";
 // Each person's Telegram chat ID (found during setup)
 const CHAT_IDS = {
     David:  "8757424376",
-    Julius: "JULIUS_CHAT_ID_HERE",
+    Julius: "7653301689",
     Alvin:  "ALVIN_CHAT_ID_HERE"
 };
 
