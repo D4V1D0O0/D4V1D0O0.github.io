@@ -75,25 +75,24 @@ function displayEntries() {
     if (!entriesList) return;
 
     // ── Donut chart ───────────────────────────────────────────
-    const donutArc     = el('donutSpentArc');
-    const donutPct     = el('donutPct');
+    const donutArc      = el('donutSpentArc');
+    const donutPct      = el('donutPct');
     const donutSpentAmt = el('donutSpentAmt');
     const donutLeftAmt  = el('donutLeftAmt');
 
     if (donutArc && startingBalance > 0) {
-        const spent      = purchases.reduce((s, e) => s + (e.TotalCost || 0), 0);
-        const remaining  = Math.max(startingBalance - spent, 0);
-        const pct        = Math.min(spent / startingBalance, 1);
+        const spent       = purchases.reduce((s, e) => s + (e.TotalCost || 0), 0);
+        const remaining   = Math.max(startingBalance - spent, 0);
+        const pct         = Math.min(spent / startingBalance, 1);
         const circumference = 2 * Math.PI * 48; // r=48 → ~301.6
-        const spentDash  = (pct * circumference).toFixed(1);
-        const gapDash    = (circumference - spentDash).toFixed(1);
+        const spentDash   = (pct * circumference).toFixed(1);
+        const gapDash     = (circumference - spentDash).toFixed(1);
 
         donutArc.setAttribute('stroke-dasharray', `${spentDash} ${gapDash}`);
         if (donutPct)      donutPct.textContent      = Math.round(pct * 100) + '%';
         if (donutSpentAmt) donutSpentAmt.textContent = formatAmount(spent) + ' kr';
         if (donutLeftAmt)  donutLeftAmt.textContent  = formatAmount(remaining) + ' kr';
     } else if (donutArc) {
-        // No starting balance set yet
         if (donutPct)      donutPct.textContent      = '—';
         if (donutSpentAmt) donutSpentAmt.textContent = '— kr';
         if (donutLeftAmt)  donutLeftAmt.textContent  = '— kr';
@@ -154,7 +153,7 @@ function loadData() {
     }, () => { startingBalanceLoaded = true; });
 
     onSnapshot(purchasesRef, (snap) => {
-        purchases     = snap.exists() ? (snap.data().entries || []) : [];
+        purchases       = snap.exists() ? (snap.data().entries || []) : [];
         purchasesLoaded = true;
         displayBalance();
         displayEntries();
@@ -305,10 +304,10 @@ if (expenseForm) {
         displayEntries();
         displayDebts();
 
-        el('itemInput').value          = '';
-        el('totalAmountInput').value   = '';
+        el('itemInput').value           = '';
+        el('totalAmountInput').value    = '';
         el('personalAmountInput').value = '';
-        el('payerSelect').value        = '';
+        el('payerSelect').value         = '';
     });
 }
 
@@ -319,21 +318,28 @@ if (debtForm) {
         e.preventDefault();
 
         const from    = el('debtFrom').value;
-        const to      = el('debtTo').value;
+        // Always read "to" (the creditor = logged-in user) from localStorage,
+        // not from the hidden DOM field — that field gets cleared on iOS/some
+        // browsers after the first submit and causes subsequent debts to lose
+        // the "to" value.
+        const to      = localStorage.getItem('saldo_user') || '';
         const amount  = parseFloat(el('debtAmount').value);
         const message = el('debtMessage').value.trim();
 
-        if (from === to)          { await showAlert('Kan inte vara samma person'); return; }
+        if (!to)                          { await showAlert('Ingen inloggad användare hittades.'); return; }
+        if (!from)                        { await showAlert('Välj vem som är skyldig dig.'); return; }
+        if (from === to)                  { await showAlert('Kan inte vara samma person'); return; }
         if (isNaN(amount) || amount <= 0) { await showAlert('Ange ett giltigt belopp.'); return; }
-        if (!message)             { await showAlert('Ange ett meddelande.'); return; }
+        if (!message)                     { await showAlert('Ange ett meddelande.'); return; }
 
         const entry = { id: uid(), from, to, amount, message, date: new Date().toISOString() };
         await updateDoc(debtsRef, { entries: arrayUnion(entry) });
-        notifyDebtAdded(entry, localStorage.getItem('saldo_user'));
+        notifyDebtAdded(entry, to);
 
+        // Only reset the fields that should be cleared — never touch debtTo
+        // (it is a hidden field pre-set to the logged-in user and must stay intact)
         el('debtAmount').value  = '';
         el('debtMessage').value = '';
-        el('debtTo').value      = '';
         el('debtFrom').value    = '';
     });
 }

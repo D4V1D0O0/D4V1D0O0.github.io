@@ -18,6 +18,7 @@
     --text-muted:   #707070;
     --danger:       #c0392b;
     --danger-dark:  #922b21;
+    --paid-green:   #7ecb7e;
     --radius-sm:    8px;
     --radius-md:    12px;
     --radius-lg:    16px;
@@ -2400,3 +2401,223 @@ body.login-page::after {
 .laundry-btn:hover{
     background: var(--accent-dark);
 }
+
+/* =============================================
+   DEBTS PAGE — CREDITOR LIST (removable rows)
+============================================= */
+.debts-removable-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+ 
+.debts-removable-list::-webkit-scrollbar { width: 4px; }
+.debts-removable-list::-webkit-scrollbar-track { background: transparent; }
+.debts-removable-list::-webkit-scrollbar-thumb { background: rgba(213,115,4,0.3); border-radius: 4px; }
+ 
+.debt-removable-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--accent-subtle);
+    border: 1px solid rgba(213,115,4,0.15);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    transition: background 0.15s ease;
+}
+ 
+.debt-removable-row:hover {
+    background: rgba(213,115,4,0.12);
+}
+ 
+.debt-removable-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+ 
+.debt-removable-from {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+}
+ 
+.debt-removable-msg {
+    font-size: 12px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+ 
+.debt-removable-date {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 1px;
+}
+ 
+.debt-removable-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+}
+ 
+.debt-removable-amount {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    line-height: 1;
+}
+ 
+/* =============================================
+   DEBTS PAGE — PER-DEBT SELECTION (payer view)
+============================================= */
+#debtItemsList {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 4px 0 4px;
+}
+ 
+.debt-select-all-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 4px 10px;
+    border-bottom: 1px solid rgba(213,115,4,0.15);
+    margin-bottom: 2px;
+}
+ 
+.debt-select-total-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+ 
+.debt-select-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--accent-subtle);
+    border: 1px solid rgba(213,115,4,0.12);
+    border-radius: var(--radius-sm);
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+ 
+.debt-select-row:has(.debt-item-checkbox:checked) {
+    background: rgba(213,115,4,0.12);
+    border-color: rgba(213,115,4,0.3);
+}
+ 
+.debt-select-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    flex: 1;
+    min-width: 0;
+}
+ 
+.debt-checkbox {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+    border-radius: 4px;
+}
+ 
+.debt-select-msg {
+    font-size: 13px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+}
+ 
+.debt-select-amount {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 17px;
+    color: var(--accent);
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+}
+ 
+/* =============================================
+   DEBTS PAGE — PAID DEBT ROWS (modal)
+============================================= */
+.debt-paid-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 13px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 6px;
+}
+ 
+/* Green — money received (someone paid you) */
+.debt-paid-row--received {
+    background: rgba(126, 203, 126, 0.06);
+    border: 1px solid rgba(126, 203, 126, 0.18);
+    border-left: 3px solid var(--paid-green);
+}
+ 
+/* Red — money sent (you paid someone) */
+.debt-paid-row--sent {
+    background: rgba(192, 57, 43, 0.06);
+    border: 1px solid rgba(192, 57, 43, 0.18);
+    border-left: 3px solid var(--danger);
+}
+ 
+.debt-paid-amount {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+    line-height: 1;
+}
+ 
+.debt-paid-amount--received {
+    color: var(--paid-green);
+}
+ 
+.debt-paid-amount--sent {
+    color: var(--danger);
+}
+ 
+/* =============================================
+   DEBTS PAGE — "BETALDA" BUTTON & BADGE
+============================================= */
+.show-paid-btn {
+    margin-left: auto;
+    gap: 6px;
+    font-size: 11px;
+    padding: 5px 10px;
+    /* override default btn-ghost danger hover for this one */
+    border-color: var(--accent-dark);
+    color: var(--text-muted);
+}
+ 
+.show-paid-btn:active,
+.show-paid-btn:hover {
+    color: var(--accent) !important;
+    border-color: var(--accent) !important;
+    background: var(--accent-subtle) !important;
+}
+

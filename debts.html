@@ -33,6 +33,7 @@
             <h1 class="subpage-title">Skulder</h1>
         </div>
 
+        <!-- Who am I -->
         <div class="swish-user-banner">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             Inloggad som <strong id="swishCurrentUser">—</strong>
@@ -44,34 +45,44 @@
                 Betala till
                 <select id="receiverSelect" class="field-input"></select>
             </label>
+
+            <!-- Per-debt selection list -->
+            <div id="debtItemsList"></div>
+
             <div class="swish-amount-row">
-                <span class="swish-amount-label">Din skuld</span>
+                <span class="swish-amount-label">Att betala</span>
                 <span class="swish-amount-value"><span id="amountText">0.00</span> kr</span>
             </div>
-            <p id="swishNoDebt" class="swish-no-debt" style="display:none;">Inga skulder att betala &#127881;</p>
+
+            <!-- <p id="swishNoDebt" class="swish-no-debt hidden">Inga skulder att betala 🎉</p> -->
+
             <button id="payBtn" class="btn btn-primary swish-pay-btn">
                 Betala med
                 <img src="images/swish-logo.svg" alt="Swish" height="18">
             </button>
         </div>
 
-        <!-- Debts you have added (removable) -->
+        <!-- Debts YOU have added (unpaid, removable) -->
         <div class="section-card entries-card">
             <div class="section-card-header">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
                 Skulder du har lagt till
+                <button id="showPaidDebtsBtn" class="btn-ghost show-paid-btn">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Historik
+                </button>
             </div>
             <p class="chores-hint">Du kan bara ta bort skulder som du själv lade till.</p>
             <div id="myDebtsList" class="debts-removable-list"></div>
-            <p id="myDebtsEmpty" class="chores-empty" style="display:none;">Du har inte lagt till några skulder</p>
+            <p id="myDebtsEmpty" class="chores-empty" style="display: none;">Du har inte lagt till några skulder</p>
         </div>
 
         <!-- hidden — kept for swish.js compatibility -->
-        <select id="meSelect" style="display:none;"></select>
+        <select id="meSelect" style="display: none;"></select>
 
     </div>
 
-    <!-- Swish payment confirmation modal (swish.js populates the body) -->
+    <!-- Swish payment confirmation modal -->
     <div id="paymentModal" class="modal-overlay payment-modal-overlay">
         <div class="modal">
             <div class="modal-header">
@@ -87,8 +98,23 @@
         </div>
     </div>
 
+    <!-- Paid debts history modal -->
+    <div id="paidDebtsModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Betalda skulder</h2>
+                <button id="closePaidDebtsModal" class="modal-close-btn" aria-label="Stäng">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="paidDebtsList"></div>
+                <p id="paidDebtsEmpty" class="chores-empty hidden">Inga betalda skulder ännu</p>
+            </div>
+        </div>
+    </div>
 
-    <!-- Shared app modal (used by modal.js instead of alert/confirm) -->
+    <!-- Shared app modal -->
     <div id="appModal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
@@ -114,25 +140,15 @@
         const user = localStorage.getItem('saldo_user') || '';
         const swishBanner = document.getElementById('swishCurrentUser');
         if (swishBanner) swishBanner.textContent = user;
-        const meSelect = document.getElementById('meSelect');
-        if (meSelect) {
-            const opt = document.createElement('option');
-            opt.value = user; opt.textContent = user; opt.selected = true;
-            meSelect.appendChild(opt);
-        }
 
-        // Wire payment modal buttons — swish.js skips adding these when
-        // it finds a pre-built #paymentModal, so we add them here instead.
         document.addEventListener('DOMContentLoaded', () => {
             const cancelBtn  = document.getElementById('paymentCancelBtn');
             const confirmBtn = document.getElementById('paymentConfirmBtn');
-            if (cancelBtn)  cancelBtn.addEventListener('click',  () => {
+            if (cancelBtn)  cancelBtn.addEventListener('click', () => {
                 document.getElementById('paymentModal')?.classList.remove('active');
                 window.pendingPayment = null;
             });
-            if (confirmBtn) confirmBtn.addEventListener('click',  () => {
-                // swish.js attaches confirmPayment via its own addEventListener in createPaymentModal
-                // but since we pre-built the modal, we need to call it via the global
+            if (confirmBtn) confirmBtn.addEventListener('click', () => {
                 if (typeof confirmPayment === 'function') confirmPayment();
             });
         });
