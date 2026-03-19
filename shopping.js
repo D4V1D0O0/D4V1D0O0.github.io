@@ -62,6 +62,7 @@ function getUncheckedEls() {
 }
 
 function startDrag(li, clientY) {
+    if (navigator.vibrate) navigator.vibrate(14);
     dragging    = true;
     dragLi      = li;
     grabOffsetY = clientY - li.getBoundingClientRect().top;
@@ -79,7 +80,6 @@ function startDrag(li, clientY) {
     li.classList.add('shopping-item-dragging');
 
     document.body.classList.add('sorting');
-    if (navigator.vibrate) navigator.vibrate(14);
 }
 
 function moveDrag(clientY) {
