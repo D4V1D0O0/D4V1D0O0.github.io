@@ -1,6 +1,7 @@
 {
-  "name": "Saldo",
-  "short_name": "Saldo",
+  "name": "BΩNG House",
+  "short_name": "BΩNG House",
+  "start_url": "/",
   "icons": [
     {
       "src": "/images/web-app-manifest-192x192.png",
