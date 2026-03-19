@@ -61,27 +61,7 @@ function getUncheckedEls() {
     return [...shoppingList.querySelectorAll('li[data-id]:not(.shopping-item-checked)')];
 }
 
-function triggerHaptic() {
-    if (navigator.vibrate) {
-        navigator.vibrate(14);
-        return;
-    }
-    try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        gain.gain.setValueAtTime(0.08, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
-        osc.frequency.setValueAtTime(200, ctx.currentTime);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + 0.05);
-    } catch (_) {}
-}
-
 function startDrag(li, clientY) {
-    triggerHaptic();
     dragging    = true;
     dragLi      = li;
     grabOffsetY = clientY - li.getBoundingClientRect().top;
